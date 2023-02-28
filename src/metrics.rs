@@ -1,4 +1,4 @@
-use crate::{primitives::{TeamAnswers, GlobalAnswers}};
+use crate::{primitives::{TeamAnswers, GlobalAnswers, Tag, TagsAPIResponse}};
 
 pub fn print_title(date_start: &String, date_end: &String, site: &String)  {
     println!("-- Questions on {} from {} to {} --", &site, &date_start, &date_end);
@@ -34,5 +34,14 @@ pub fn print_ratios(global_data: &GlobalAnswers, team_data: &TeamAnswers)  {
 
     let float_division_answered_team= *team_data.answers() as f64 / questions_answered as f64; 
     println!("{:?} % answered by the team over answered questions", float_division_answered_team * 100 as f64);
+    println!();
+}
+
+pub fn print_tags(tags: &TagsAPIResponse)  {
+    println!("------ Hot Tags ------");
+    println!("{:?}", &tags.items);
+    for tag in &tags.items {
+        println!("{:?} - {:?}", tag.name, tag.count);
+    }
     println!();
 }

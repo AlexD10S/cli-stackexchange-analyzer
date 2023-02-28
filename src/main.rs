@@ -13,8 +13,9 @@ struct Cli {
     date_start: String,
     date_end: String,
     #[clap(short, long, value_parser, num_args = 1.., value_delimiter = ' ')]
-    members: Option<Vec<u32>>
-
+    members: Option<Vec<u32>>,
+    #[clap(long, short, action)]
+    tags: bool
 }
 
 #[tokio::main]
@@ -33,6 +34,11 @@ async fn main() {
         let team_data = core::collect_team_data(&questions, &args.site, team_members).await;
         metrics::print_team_data(&team_data);
         metrics::print_ratios(&global_data, &team_data);
+    }
+
+    if args.tags {
+        let tags = api::get_top_tags(timestamp_start, timestamp_end, &args.site).await;
+        metrics::print_tags(&tags);
     }
 }
 

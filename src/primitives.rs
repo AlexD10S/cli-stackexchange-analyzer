@@ -38,6 +38,22 @@ pub struct Owner {
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct TagsAPIResponse {
+    pub items: Vec<Tag>,
+    has_more: bool,
+    quota_max: u64,
+    quota_remaining: u64
+}
+#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct Tag {
+    has_synonyms: bool,
+    is_moderator_only: bool,
+    is_required: bool,
+    pub count: u32,
+    pub name: String,
+}
+
+#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct GlobalAnswers {
     total_questions: usize,
     total_unanswered: usize,
