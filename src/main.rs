@@ -3,6 +3,7 @@ use clap::Parser;
 mod primitives;
 mod api;
 mod utils;
+mod core;
 
 
 #[derive(Parser)]
@@ -20,7 +21,8 @@ async fn main() {
 
     let questions = api::get_questions(timestamp_start, timestamp_end, &args.site).await;
     println!("-- Questions on {} from {} to {} --", &args.site, &args.date_start, &args.date_end);
-    println!("{:?}", questions)
+
+    core::collect_data(questions, &args.site).await;
 }
 
 
