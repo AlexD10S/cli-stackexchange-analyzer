@@ -5,7 +5,7 @@ mod primitives;
 mod api;
 mod utils;
 mod core;
-
+mod metrics;
 
 #[derive(Parser, Deserialize, Debug)]
 struct Cli {
@@ -24,17 +24,16 @@ async fn main() {
     let timestamp_end = utils::get_epoch_ms(&args.date_end);
 
     let questions = api::get_questions(timestamp_start, timestamp_end, &args.site).await;
-    println!("-- Questions on {} from {} to {} --", &args.site, &args.date_start, &args.date_end);
-    println!();
+    metrics::print_title(&args.date_start, &args.date_end, &args.site);
     
     let global_data = core::collect_global_data(&questions).await;
+    metrics::print_global_data(&global_data);
 
     if let Some(team_members) = &args.members {
         let team_data = core::collect_team_data(&questions, &args.site, team_members).await;
-        core::print_ratios(&global_data, &team_data);
+        metrics::print_team_data(&team_data);
+        metrics::print_ratios(&global_data, &team_data);
     }
-
-    println!("---------------------");
 }
 
 
