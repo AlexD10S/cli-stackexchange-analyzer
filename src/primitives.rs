@@ -27,12 +27,57 @@ pub struct Item {
 }
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Owner {
-    account_id: u128,
+    account_id: u32,
     reputation: u64,
-    user_id: u64,
+    pub user_id: u32,
     user_type: String,
     profile_image: String,
     display_name: String,
     link: String,
     accept_rate: Option<u64>
+}
+
+#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct GlobalAnswers {
+    total_questions: usize,
+    total_unanswered: usize,
+}
+impl GlobalAnswers {
+    pub fn new(total_questions: usize, total_unanswered: usize) -> Self {
+        GlobalAnswers { total_questions, total_unanswered}
+    }
+    pub fn total_questions(&self) -> &usize {
+        &self.total_questions
+    }
+    pub fn total_unanswered(&self) -> &usize {
+        &self.total_unanswered
+    }
+}
+
+#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct TeamAnswers {
+    answers: u32,
+    score: u32,
+    accepted: u32,
+}
+impl TeamAnswers {
+    pub fn new(answers: u32, score: u32, accepted: u32) -> Self {
+        TeamAnswers { answers, score, accepted}
+    }
+    pub fn answers(&self) -> &u32 {
+        &self.answers
+    }
+    pub fn score(&self) -> &u32 {
+        &self.score
+    }
+    pub fn accepted(&self) -> &u32 {
+        &self.accepted
+    }
+    pub fn question_answered(&self, answer: TeamAnswers) -> TeamAnswers {
+        return TeamAnswers { 
+            answers: self.answers + answer.answers(), 
+            score: self.score + answer.score(),
+            accepted: self.accepted + answer.accepted()
+        }
+    }
 }
