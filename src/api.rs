@@ -1,10 +1,12 @@
 use reqwest::{ header::{CONTENT_TYPE, ACCEPT}};
-use crate::{primitives::{APIResponse, TagsAPIResponse}};
+use crate::{primitives::{APIResponse, TagsAPIResponse}, utils::Period};
 
 
-pub async fn get_questions(timestamp_start: i64, timestamp_end: i64, site: &String) -> APIResponse {
+pub async fn get_questions(period: &Period, site: &String) -> APIResponse {
     let url = format!(
-        "https://api.stackexchange.com/2.3/questions?fromdate={timestamp_start}&todate={timestamp_end}&site={site}"
+        "https://api.stackexchange.com/2.3/questions?fromdate={timestamp_start}&todate={timestamp_end}&site={site}",
+        timestamp_start = period.timestamp_start,
+        timestamp_end = period.timestamp_end,
     );
     let client = reqwest::Client::new();
     let response = client
@@ -56,9 +58,11 @@ pub async fn get_answers(question_id: u128, site: &String) -> APIResponse {
     }
 }
 
-pub async fn get_top_tags(timestamp_start: i64, timestamp_end: i64, site: &String) -> TagsAPIResponse {
+pub async fn get_top_tags(period: &Period, site: &String) -> TagsAPIResponse {
     let url = format!(
-        "https://api.stackexchange.com/2.3/tags?fromdate={timestamp_start}&todate={timestamp_end}&site={site}"
+        "https://api.stackexchange.com/2.3/tags?fromdate={timestamp_start}&todate={timestamp_end}&site={site}",
+        timestamp_start = period.timestamp_start,
+        timestamp_end = period.timestamp_end,
     );
     println!("{}", url);
     let client = reqwest::Client::new();

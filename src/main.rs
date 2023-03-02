@@ -21,10 +21,9 @@ struct Cli {
 #[tokio::main]
 async fn main() {
     let args = Cli::parse();
-    let timestamp_start = utils::get_epoch_ms(&args.date_start);
-    let timestamp_end = utils::get_epoch_ms(&args.date_end);
+    let period = utils::get_period_in_ms(&args.date_start, &args.date_end);
 
-    let questions = api::get_questions(timestamp_start, timestamp_end, &args.site).await;
+    let questions = api::get_questions(&period, &args.site).await;
     metrics::print_title(&args.date_start, &args.date_end, &args.site);
     
     let global_data = core::collect_global_data(&questions).await;
@@ -37,7 +36,7 @@ async fn main() {
     }
 
     if args.tags {
-        let tags = api::get_top_tags(timestamp_start, timestamp_end, &args.site).await;
+        let tags = api::get_top_tags(&period, &args.site).await;
         metrics::print_tags(&tags);
     }
 }
