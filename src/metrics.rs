@@ -37,6 +37,17 @@ pub fn print_ratios(global_data: &GlobalAnswers, team_data: &TeamAnswers)  {
     println!();
 }
 
+pub fn print_individual_data(team_answered_questions: &TeamAnswers)  {
+    println!("------ Individual Metrics ------");
+    println!();
+    let mut sorted_list = team_answered_questions.answers_by_member().clone();
+    sorted_list.sort_by(|a, b| b.count.cmp(&a.count));
+    for member in  sorted_list{ 
+        println!("User {:?} -- Questions: {:?}", member.user_id, member.count); 
+    }
+    println!();
+}
+
 pub fn print_tags(global_data: &GlobalAnswers,)  {
     const HOT_EMOJI: char = '\u{1F525}';
     println!("------ Hot Tags {:?} {:?}------", HOT_EMOJI, HOT_EMOJI );
@@ -55,6 +66,6 @@ fn print_list(tags_vec: &Vec<Tag>)  {
     let mut sorted_list = tags_vec.clone();
     sorted_list.sort_by(|a, b| b.count.cmp(&a.count));
     for n in 0..NUMBER_OF_HOT_TAGS { 
-        println!("{:?} -- Number of questions with this Tag: {:?}", sorted_list[n].name, sorted_list[n].count); 
+        println!("{:?} -- Number of questions with this Tag: {:?}", sorted_list[n].name.to_string(), sorted_list[n].count); 
     }
 }

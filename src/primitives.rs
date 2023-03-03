@@ -2,6 +2,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Options {
     pub tags: bool,
+    pub individual: bool,
 }
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct APIResponse {
@@ -81,14 +82,20 @@ impl GlobalAnswers {
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct MemberAnswer {
+    pub user_id: u32,
+    pub count: u32,
+}
+#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct TeamAnswers {
     answers: u32,
     score: u32,
     accepted: u32,
+    answers_by_member: Vec<MemberAnswer>,
 }
 impl TeamAnswers {
-    pub fn new(answers: u32, score: u32, accepted: u32) -> Self {
-        TeamAnswers { answers, score, accepted}
+    pub fn new(answers: u32, score: u32, accepted: u32, answers_by_member: Vec<MemberAnswer>) -> Self {
+        TeamAnswers { answers, score, accepted, answers_by_member}
     }
     pub fn answers(&self) -> &u32 {
         &self.answers
@@ -99,11 +106,15 @@ impl TeamAnswers {
     pub fn accepted(&self) -> &u32 {
         &self.accepted
     }
+    pub fn answers_by_member(&self) -> &Vec<MemberAnswer> {
+        &self.answers_by_member
+    }
     pub fn question_answered(&self, answer: TeamAnswers) -> TeamAnswers {
         return TeamAnswers { 
             answers: self.answers + answer.answers(), 
             score: self.score + answer.score(),
-            accepted: self.accepted + answer.accepted()
+            accepted: self.accepted + answer.accepted(),
+            answers_by_member: answer.answers_by_member().to_vec()
         }
     }
 }

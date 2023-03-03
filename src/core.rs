@@ -1,4 +1,4 @@
-use crate::{primitives::{APIResponse, TeamAnswers, GlobalAnswers, Options, Tag}, api};
+use crate::{primitives::{APIResponse, TeamAnswers, GlobalAnswers, Options, Tag, MemberAnswer}, api};
 
 pub async fn collect_global_data(questions: &APIResponse, options: &Options) -> GlobalAnswers  {
     let total_questions = questions.items.len();
@@ -21,23 +21,28 @@ pub async fn collect_global_data(questions: &APIResponse, options: &Options) -> 
     return global_data;
 }
 
-pub async fn collect_team_data(questions: &APIResponse,  site: &String, members: &Vec<u32>) -> TeamAnswers  {
-    let mut team_answered =  TeamAnswers::new(0,0,0);
+pub async fn collect_team_data(questions: &APIResponse, site: &String, members: &Vec<u32>, options: &Options) -> TeamAnswers  {
+    let answers_by_member = Vec::new();
+    let mut team_answered =  TeamAnswers::new(0,0,0, answers_by_member);
     for question in &questions.items {
         if question.is_answered.unwrap() {
             let answers: APIResponse = api::get_answers(question.question_id, site).await;
-            team_answered = team_answered.question_answered(parse_answers(answers, members));
+            team_answered = team_answered.question_answered(parse_answers(answers, members, options));
         }
     }
     return team_answered
 }
 
-fn parse_answers(answers: APIResponse, team_members: &Vec<u32>) ->  TeamAnswers {
-    let mut team_answered =  TeamAnswers::new(0,0,0);
+fn parse_answers(answers: APIResponse, team_members: &Vec<u32>, options: &Options) ->  TeamAnswers {
+    let mut answers_by_member_vec = Vec::new();
+    let mut team_answered =  TeamAnswers::new(0,0,0, Vec::new());
     for answer in &answers.items {
         if team_members.contains(&answer.owner.user_id)  {
+            if options.individual {
+                add_member_response(&mut answers_by_member_vec, &answer.owner.user_id);
+            }
             let aux = TeamAnswers::new(
-                1, answer.score, answer.is_accepted.unwrap_or(false) as u32
+                1, answer.score, answer.is_accepted.unwrap_or(false) as u32, answers_by_member_vec.to_vec()
             );
             team_answered = team_answered.question_answered(aux);
         }
@@ -57,4 +62,16 @@ fn add_tags(tags_vec: &mut Vec<Tag>, question_tags: &Vec<String>) {
             tags_vec.push(Tag{name: tag.to_string(), count: 1});
         }
     }  
+}
+
+fn add_member_response(answers_by_member_vec: &mut Vec<MemberAnswer>, member_id: &u32) {
+    let exists = answers_by_member_vec.iter().find(|&x| x.user_id == *member_id).is_some();
+    if exists {
+        let existing_member_index = answers_by_member_vec.iter().position(|x| x.user_id == *member_id).unwrap();
+        let count = answers_by_member_vec[existing_member_index].count;
+        answers_by_member_vec[existing_member_index] = MemberAnswer {user_id: *member_id, count: count + 1}
+    }
+    else {
+        answers_by_member_vec.push(MemberAnswer{user_id: *member_id, count: 1});
+    }
 }
