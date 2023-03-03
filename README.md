@@ -23,6 +23,12 @@ Example:
 cargo run -- substrate 02/03/2023 06/03/2023 --members 1 2 3 4
 ```
 
+Use the optional flag --individual if want to retrieve the individual information of the team members:
+
+```shell
+cargo run -- substrate 02/03/2023 06/03/2023  --members 1 2 3 4 --individual
+```
+
 And also get the hot tags with the optional flag --tags:
 
 ```shell
