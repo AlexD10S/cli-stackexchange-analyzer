@@ -1,5 +1,9 @@
 use serde::{Deserialize, Serialize};
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct Options {
+    pub tags: bool,
+}
+#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct APIResponse {
     pub items: Vec<Item>,
     has_more: bool,
@@ -38,35 +42,41 @@ pub struct Owner {
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub struct TagsAPIResponse {
-    pub items: Vec<Tag>,
-    has_more: bool,
-    quota_max: u64,
-    quota_remaining: u64
-}
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Tag {
-    has_synonyms: bool,
-    is_moderator_only: bool,
-    is_required: bool,
-    pub count: u32,
     pub name: String,
+    pub count: u32,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct GlobalAnswers {
     total_questions: usize,
     total_unanswered: usize,
+    tags_total: Vec<Tag>,
+    tags_unanswered: Vec<Tag>,
 }
 impl GlobalAnswers {
-    pub fn new(total_questions: usize, total_unanswered: usize) -> Self {
-        GlobalAnswers { total_questions, total_unanswered}
+    pub fn new(total_questions: usize, total_unanswered: usize, tags_total: Vec<Tag>, tags_unanswered: Vec<Tag>) -> Self {
+        GlobalAnswers { total_questions, total_unanswered, tags_total, tags_unanswered}
     }
     pub fn total_questions(&self) -> &usize {
         &self.total_questions
     }
     pub fn total_unanswered(&self) -> &usize {
         &self.total_unanswered
+    }
+    pub fn tags_total(&self) -> &Vec<Tag> {
+        &self.tags_total
+    }
+    pub fn tags_unanswered(&self) -> &Vec<Tag> {
+        &self.tags_unanswered
+    }
+    pub fn add_tags(&self, vec_tags_total: Vec<Tag>,  vec_tags_unanswered: Vec<Tag>) -> Self{
+        Self {
+            total_questions:  self.total_questions,
+            total_unanswered: self.total_unanswered,
+            tags_total: vec_tags_total,
+            tags_unanswered: vec_tags_unanswered
+        }
     }
 }
 

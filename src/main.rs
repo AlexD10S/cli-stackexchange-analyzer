@@ -22,11 +22,12 @@ struct Cli {
 async fn main() {
     let args = Cli::parse();
     let period = utils::get_period_in_ms(&args.date_start, &args.date_end);
+    let options = primitives::Options { tags: args.tags};
 
     let questions = api::get_questions(&period, &args.site).await;
     metrics::print_title(&args.date_start, &args.date_end, &args.site);
     
-    let global_data = core::collect_global_data(&questions).await;
+    let global_data = core::collect_global_data(&questions, &options).await;
     metrics::print_global_data(&global_data);
 
     if let Some(team_members) = &args.members {
@@ -35,9 +36,8 @@ async fn main() {
         metrics::print_ratios(&global_data, &team_data);
     }
 
-    if args.tags {
-        let tags = api::get_top_tags(&period, &args.site).await;
-        metrics::print_tags(&tags);
+    if options.tags {
+        metrics::print_tags(&global_data);
     }
 }
 

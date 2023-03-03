@@ -1,4 +1,4 @@
-use crate::{primitives::{TeamAnswers, GlobalAnswers, Tag, TagsAPIResponse}};
+use crate::{primitives::{TeamAnswers, GlobalAnswers, Tag}};
 
 pub fn print_title(date_start: &String, date_end: &String, site: &String)  {
     println!("-- Questions on {} from {} to {} --", &site, &date_start, &date_end);
@@ -37,11 +37,24 @@ pub fn print_ratios(global_data: &GlobalAnswers, team_data: &TeamAnswers)  {
     println!();
 }
 
-pub fn print_tags(tags: &TagsAPIResponse)  {
-    println!("------ Hot Tags ------");
-    println!("{:?}", &tags.items);
-    for tag in &tags.items {
-        println!("{:?} - {:?}", tag.name, tag.count);
-    }
+pub fn print_tags(global_data: &GlobalAnswers,)  {
+    const HOT_EMOJI: char = '\u{1F525}';
+    println!("------ Hot Tags {:?} {:?}------", HOT_EMOJI, HOT_EMOJI );
     println!();
+    println!("--- Total tags ---");
+    print_list(&global_data.tags_total());
+    println!();
+    println!("--- Unanswered tags ---");
+    print_list(&global_data.tags_unanswered());
+    println!();
+}
+
+fn print_list(tags_vec: &Vec<Tag>)  {
+    const NUMBER_OF_HOT_TAGS: usize = 3;
+
+    let mut sorted_list = tags_vec.clone();
+    sorted_list.sort_by(|a, b| b.count.cmp(&a.count));
+    for n in 0..NUMBER_OF_HOT_TAGS { 
+        println!("{:?} -- Number of questions with this Tag: {:?}", sorted_list[n].name, sorted_list[n].count); 
+    }
 }

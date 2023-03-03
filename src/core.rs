@@ -1,14 +1,23 @@
-use crate::{primitives::{APIResponse, TeamAnswers, GlobalAnswers}, api};
+use crate::{primitives::{APIResponse, TeamAnswers, GlobalAnswers, Options, Tag}, api};
 
-pub async fn collect_global_data(questions: &APIResponse) -> GlobalAnswers  {
+pub async fn collect_global_data(questions: &APIResponse, options: &Options) -> GlobalAnswers  {
     let total_questions = questions.items.len();
     let mut total_unanswered = 0;
+    let mut tags_total = Vec::new();
+    let mut tags_unanswered = Vec::new();
+   
     for question in &questions.items {
         if !question.is_answered.unwrap() {
             total_unanswered += 1;
+            if question.tags.is_some() && options.tags { 
+                add_tags(&mut tags_unanswered, question.tags.as_ref().unwrap());
+            }
+        }
+        if options.tags {
+            add_tags(&mut tags_total, question.tags.as_ref().unwrap());
         }
     }
-    let global_data =  GlobalAnswers::new(total_questions, total_unanswered);
+    let global_data =  GlobalAnswers::new(total_questions, total_unanswered, tags_total, tags_unanswered);
     return global_data;
 }
 
@@ -34,4 +43,18 @@ fn parse_answers(answers: APIResponse, team_members: &Vec<u32>) ->  TeamAnswers 
         }
     }
     return team_answered;
+}
+
+fn add_tags(tags_vec: &mut Vec<Tag>, question_tags: &Vec<String>) {
+    for tag in question_tags {
+        let exists = tags_vec.iter().find(|&x| x.name == tag.to_string()).is_some();
+        if exists {
+            let existing_tag_index = tags_vec.iter().position(|x| x.name == tag.to_string()).unwrap();
+            let count = tags_vec[existing_tag_index].count;
+            tags_vec[existing_tag_index] = Tag {name: tag.to_string(), count: count + 1}
+        }
+        else {
+            tags_vec.push(Tag{name: tag.to_string(), count: 1});
+        }
+    }  
 }
