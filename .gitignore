@@ -1,2 +1,4 @@
 /target
 /members.txt
+/.env
+.env

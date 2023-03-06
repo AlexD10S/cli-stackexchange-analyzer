@@ -7,8 +7,8 @@ pub struct Options {
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct APIResponse {
     pub items: Vec<Item>,
-    has_more: bool,
-    quota_max: u64,
+    pub has_more: bool,
+    pub quota_max: u64,
     quota_remaining: u64
 }
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]

@@ -1,5 +1,6 @@
 use clap::Parser;
 use serde::{Deserialize};
+use dotenv::dotenv;
 
 mod primitives;
 mod api;
@@ -22,11 +23,16 @@ struct Cli {
 
 #[tokio::main]
 async fn main() {
+    // This line loads the environment variables from the ".env" file.
+    dotenv().ok(); 
     let args = Cli::parse();
     let period = utils::get_period_in_ms(&args.date_start, &args.date_end);
     let options = primitives::Options { tags: args.tags, individual: args.individual};
 
     let questions = api::get_questions(&period, &args.site).await;
+    println!("{:?}", questions.items.len());
+    println!("{:?}", questions.has_more);
+    println!("{:?}", questions.quota_max);
     metrics::print_title(&args.date_start, &args.date_end, &args.site);
     
     let global_data = core::collect_global_data(&questions, &options).await;
