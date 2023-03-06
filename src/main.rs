@@ -30,16 +30,15 @@ async fn main() {
     let options = primitives::Options { tags: args.tags, individual: args.individual};
 
     let questions = api::get_questions(&period, &args.site).await;
-    println!("{:?}", questions.items.len());
-    println!("{:?}", questions.has_more);
-    println!("{:?}", questions.quota_max);
+    println!("{:?}", questions.len());
+
     metrics::print_title(&args.date_start, &args.date_end, &args.site);
     
-    let global_data = core::collect_global_data(&questions, &options).await;
+    let global_data = core::collect_global_data(questions.clone(), &options).await;
     metrics::print_global_data(&global_data);
 
     if let Some(team_members) = &args.members {
-        let team_data = core::collect_team_data(&questions, &args.site, team_members, &options).await;
+        let team_data = core::collect_team_data(questions, &args.site, team_members, &options).await;
         metrics::print_team_data(&team_data);
         if options.individual {
             metrics::print_individual_data(&team_data);

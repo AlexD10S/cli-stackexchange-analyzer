@@ -9,7 +9,7 @@ pub struct APIResponse {
     pub items: Vec<Item>,
     pub has_more: bool,
     pub quota_max: u64,
-    quota_remaining: u64
+    pub quota_remaining: u64
 }
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Item {
