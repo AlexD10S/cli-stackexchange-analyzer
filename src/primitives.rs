@@ -91,11 +91,10 @@ pub struct TeamAnswers {
     answers: u32,
     score: u32,
     accepted: u32,
-    answers_by_member: Vec<MemberAnswer>,
 }
 impl TeamAnswers {
-    pub fn new(answers: u32, score: u32, accepted: u32, answers_by_member: Vec<MemberAnswer>) -> Self {
-        TeamAnswers { answers, score, accepted, answers_by_member}
+    pub fn new(answers: u32, score: u32, accepted: u32) -> Self {
+        TeamAnswers { answers, score, accepted}
     }
     pub fn answers(&self) -> &u32 {
         &self.answers
@@ -106,15 +105,29 @@ impl TeamAnswers {
     pub fn accepted(&self) -> &u32 {
         &self.accepted
     }
-    pub fn answers_by_member(&self) -> &Vec<MemberAnswer> {
-        &self.answers_by_member
-    }
     pub fn question_answered(&self, answer: TeamAnswers) -> TeamAnswers {
-        return TeamAnswers { 
+        let new_one =  TeamAnswers { 
             answers: self.answers + answer.answers(), 
             score: self.score + answer.score(),
             accepted: self.accepted + answer.accepted(),
-            answers_by_member: answer.answers_by_member().to_vec()
-        }
+        };
+        return new_one;
+    }
+}
+
+#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct Answers {
+    pub team_answers: TeamAnswers,
+    pub individual_answers: Vec<MemberAnswer>,
+}
+impl Answers {
+    pub fn new(team_answers: TeamAnswers, individual_answers: Vec<MemberAnswer>) -> Self {
+        Answers { team_answers, individual_answers}
+    }
+    pub fn team_answers(&self) -> &TeamAnswers {
+        &self.team_answers
+    }
+    pub fn individual_answers(&self) -> &Vec<MemberAnswer> {
+        &self.individual_answers
     }
 }

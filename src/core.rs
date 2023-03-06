@@ -1,4 +1,4 @@
-use crate::{primitives::{APIResponse, Item, TeamAnswers, GlobalAnswers, Options, Tag, MemberAnswer}, api};
+use crate::{primitives::{APIResponse, Item, TeamAnswers, GlobalAnswers, Options, Tag, MemberAnswer, Answers}, api};
 
 pub async fn collect_global_data(questions: Vec<Item>, options: &Options) -> GlobalAnswers  {
     let total_questions = questions.len();
@@ -21,32 +21,33 @@ pub async fn collect_global_data(questions: Vec<Item>, options: &Options) -> Glo
     return global_data;
 }
 
-pub async fn collect_team_data(questions: Vec<Item>, site: &String, members: &Vec<u32>, options: &Options) -> TeamAnswers  {
-    let answers_by_member = Vec::new();
-    let mut team_answered =  TeamAnswers::new(0,0,0, answers_by_member);
+pub async fn collect_team_data(questions: Vec<Item>, site: &String, members: &Vec<u32>, options: &Options) -> Answers  {
+    let mut answers_by_member = Vec::new();
+    let mut team_answered =  TeamAnswers::new(0,0,0);
     for question in &questions {
         if question.is_answered.unwrap() {
             let answers: APIResponse = api::get_answers(question.question_id, site).await;
-            team_answered = team_answered.question_answered(parse_answers(answers, members, options));
+            team_answered = team_answered.question_answered(parse_answers(answers, &mut answers_by_member, members, options));
         }
     }
-    return team_answered
+    let answers: Answers = Answers::new(team_answered, answers_by_member);
+    return answers
 }
 
-fn parse_answers(answers: APIResponse, team_members: &Vec<u32>, options: &Options) ->  TeamAnswers {
-    let mut answers_by_member_vec = Vec::new();
-    let mut team_answered =  TeamAnswers::new(0,0,0, Vec::new());
+fn parse_answers(answers: APIResponse, answers_by_member_vec: &mut Vec<MemberAnswer>,team_members: &Vec<u32>, options: &Options) ->  TeamAnswers {
+    let mut team_answered =  TeamAnswers::new(0,0,0);
     for answer in &answers.items {
         if team_members.contains(&answer.owner.user_id)  {
             if options.individual {
-                add_member_response(&mut answers_by_member_vec, &answer.owner.user_id);
+                add_member_response(answers_by_member_vec, &answer.owner.user_id);
             }
             let aux = TeamAnswers::new(
-                1, answer.score, answer.is_accepted.unwrap_or(false) as u32, answers_by_member_vec.to_vec()
+                1, answer.score, answer.is_accepted.unwrap_or(false) as u32
             );
             team_answered = team_answered.question_answered(aux);
         }
     }
+    
     return team_answered;
 }
 

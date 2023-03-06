@@ -1,4 +1,4 @@
-use crate::{primitives::{TeamAnswers, GlobalAnswers, Tag}};
+use crate::{primitives::{TeamAnswers, GlobalAnswers, Tag, MemberAnswer}};
 
 pub fn print_title(date_start: &String, date_end: &String, site: &String)  {
     println!("-- Questions on {} from {} to {} --", &site, &date_start, &date_end);
@@ -37,10 +37,10 @@ pub fn print_ratios(global_data: &GlobalAnswers, team_data: &TeamAnswers)  {
     println!();
 }
 
-pub fn print_individual_data(team_answered_questions: &TeamAnswers)  {
+pub fn print_individual_data(team_answered_questions: &Vec<MemberAnswer>)  {
     println!("------ Individual Metrics ------");
     println!();
-    let mut sorted_list = team_answered_questions.answers_by_member().clone();
+    let mut sorted_list = team_answered_questions.clone();
     sorted_list.sort_by(|a, b| b.count.cmp(&a.count));
     for member in  sorted_list{ 
         println!("User {:?} -- Questions: {:?}", member.user_id, member.count); 
