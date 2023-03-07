@@ -16,6 +16,12 @@ Example:
 cargo run -- substrate 01/02/2023 23/02/2023
 ```
 
+Example with all flags:
+
+```shell
+cargo run -- substrate 27/02/2023 28/02/2023 --members 2762 29 --tags --individual --unanswered
+```
+
 ### Team Metrics
 You can specify a list of user_ids from your site to collect metrics of your team.
 Example:
