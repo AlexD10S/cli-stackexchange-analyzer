@@ -18,7 +18,9 @@ struct Cli {
     #[clap(long, short, action)]
     tags: bool,
     #[clap(long, short, action)]
-    individual: bool
+    individual: bool,
+    #[clap(long, short, action)]
+    unanswered: bool
 }
 
 #[tokio::main]
@@ -27,7 +29,7 @@ async fn main() {
     dotenv().ok(); 
     let args = Cli::parse();
     let period = utils::get_period_in_ms(&args.date_start, &args.date_end);
-    let options = primitives::Options { tags: args.tags, individual: args.individual};
+    let options = primitives::Options { tags: args.tags, individual: args.individual, unanswered: args.unanswered};
 
     let questions = api::get_questions(&period, &args.site).await;
 
@@ -45,6 +47,10 @@ async fn main() {
         metrics::print_ratios(&global_data, &team_data.team_answers());
 
         metrics::print_response_times(&team_data);
+
+        if options.unanswered {
+            metrics::print_unanswered_analysed(&team_data.unanswered_questions());
+        }
     }
 
     if options.tags {

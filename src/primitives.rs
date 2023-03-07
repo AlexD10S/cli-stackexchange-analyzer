@@ -3,6 +3,7 @@ use serde::{Deserialize, Serialize};
 pub struct Options {
     pub tags: bool,
     pub individual: bool,
+    pub unanswered: bool,
 }
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct APIResponse {
@@ -111,13 +112,15 @@ impl TeamAnswers {
 pub struct Answers {
     team_answers: TeamAnswers,
     individual_answers: Vec<MemberAnswer>,
-    time_response_questions: Vec<ResponseTime>
+    time_response_questions: Vec<ResponseTime>,
+    unanswered_questions: Vec<UnanswerQuestions>,
 }
 impl Answers {
     pub fn new(team_answers: TeamAnswers, 
         individual_answers: Vec<MemberAnswer>, 
-        time_response_questions: Vec<ResponseTime>) -> Self {
-        Answers { team_answers, individual_answers, time_response_questions}
+        time_response_questions: Vec<ResponseTime>,
+        unanswered_questions: Vec<UnanswerQuestions>) -> Self {
+        Answers { team_answers, individual_answers, time_response_questions, unanswered_questions}
     }
     pub fn team_answers(&self) -> &TeamAnswers {
         &self.team_answers
@@ -128,6 +131,9 @@ impl Answers {
     pub fn time_response_questions(&self) -> &Vec<ResponseTime> {
         &self.time_response_questions
     }
+    pub fn unanswered_questions(&self) -> &Vec<UnanswerQuestions> {
+        &self.unanswered_questions
+    } 
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -152,4 +158,10 @@ impl ResponseTime {
     pub fn time_response(&self) -> u64 {
         self.response_date - self.creation_date
     }
+}
+
+#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct UnanswerQuestions {
+    pub answered: bool,
+    pub answered_by_team: bool,
 }

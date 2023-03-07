@@ -1,4 +1,6 @@
-use crate::{primitives::{APIResponse, Item, TeamAnswers, GlobalAnswers, Options, Tag, MemberAnswer, Answers, ResponseTime}, api};
+use crate::{primitives::{
+    APIResponse, Item, TeamAnswers, GlobalAnswers, Options, Tag, MemberAnswer, Answers, ResponseTime, UnanswerQuestions
+}, api};
 
 pub async fn collect_global_data(questions: Vec<Item>, options: &Options) -> GlobalAnswers  {
     let total_questions = questions.len();
@@ -25,6 +27,7 @@ pub async fn collect_team_data(questions: Vec<Item>, site: &String, members: &Ve
     let mut answers_by_member = Vec::new();
     let mut team_answered =  TeamAnswers::new(0,0,0);
     let mut time_response_questions: Vec<ResponseTime> = Vec::new();
+    let mut unanswered_questions: Vec<UnanswerQuestions> = Vec::new();
 
     for question in &questions {
         if question.is_answered.unwrap() {
@@ -37,10 +40,15 @@ pub async fn collect_team_data(questions: Vec<Item>, site: &String, members: &Ve
 
             time_response_questions.push(response_time);
         }
+        if !question.is_answered.unwrap() && options.unanswered {
+            let unanswered_question: UnanswerQuestions = analyse_unanswered_question(question.question_id, site, members).await;
+            unanswered_questions.push(unanswered_question);
+        }
     }
-    let answers: Answers = Answers::new(team_answered, answers_by_member, time_response_questions);
+    let answers: Answers = Answers::new(team_answered, answers_by_member, time_response_questions, unanswered_questions);
     return answers
 }
+
 
 fn parse_answers(answers: APIResponse, answers_by_member_vec: &mut Vec<MemberAnswer>,team_members: &Vec<u32>, response_time: &mut ResponseTime, options: &Options) ->  TeamAnswers {
     let mut team_answered =  TeamAnswers::new(0,0,0);
@@ -66,6 +74,19 @@ fn parse_answers(answers: APIResponse, answers_by_member_vec: &mut Vec<MemberAns
     }
     
     return team_answered;
+}
+
+async fn analyse_unanswered_question(question_id: u128, site: &String, team_members: &Vec<u32>) -> UnanswerQuestions {
+    let answers: APIResponse = api::get_answers(question_id, site).await;
+    let mut answered = false;
+    let mut answered_by_team = false;
+    for answer in &answers.items {
+        answered = true;
+        if team_members.contains(&answer.owner.user_id)  {
+            answered_by_team = true;
+        }
+    }
+    UnanswerQuestions {answered, answered_by_team}
 }
 
 fn add_tags(tags_vec: &mut Vec<Tag>, question_tags: &Vec<String>) {

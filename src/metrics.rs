@@ -1,5 +1,5 @@
 use crate::{
-    primitives::{TeamAnswers, GlobalAnswers, Tag, MemberAnswer, Answers}, 
+    primitives::{TeamAnswers, GlobalAnswers, Tag, MemberAnswer, Answers, UnanswerQuestions}, 
     utils::get_epoch_in_hr,
 };
 
@@ -72,6 +72,29 @@ pub fn print_individual_data(team_answered_questions: &Vec<MemberAnswer>)  {
     }
     println!();
 }
+
+pub fn print_unanswered_analysed(unanswered_data: &Vec<UnanswerQuestions>)  {
+    println!("------ Unanswered Questions Analysed------");
+    println!();
+    println!("From the {:?} Unanswered Questions:", unanswered_data.len()); 
+    let mut answered = 0;
+    let mut answered_by_team = 0;
+    for unanswered_question in unanswered_data{ 
+       if unanswered_question.answered {
+        answered += 1;
+       }
+       if unanswered_question.answered_by_team {
+        answered_by_team += 1;
+       }
+    }
+    println!("{:?} has an answer with 0 score", answered);
+    println!("In {:?} of them a team member answer it", answered_by_team); 
+    if unanswered_data.len() - answered  == 0 {
+        println!("{:?}  hasn't been answered at all", unanswered_data.len() - answered); 
+    }
+    println!();
+}
+
 
 pub fn print_tags(global_data: &GlobalAnswers,)  {
     const HOT_EMOJI: char = '\u{1F525}';
