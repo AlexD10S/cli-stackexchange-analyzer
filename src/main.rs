@@ -30,6 +30,7 @@ async fn main() {
     let options = primitives::Options { tags: args.tags, individual: args.individual};
 
     let questions = api::get_questions(&period, &args.site).await;
+    println!("{:?}", questions);
 
     metrics::print_title(&args.date_start, &args.date_end, &args.site);
     
@@ -44,12 +45,13 @@ async fn main() {
         }
         metrics::print_ratios(&global_data, &team_data.team_answers());
 
-        metrics::print_response_times(&team_data.time_response_questions());
+        metrics::print_response_times(&team_data);
     }
 
     if options.tags {
         metrics::print_tags(&global_data);
     }
+    
 }
 
 

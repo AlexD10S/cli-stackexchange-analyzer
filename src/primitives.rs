@@ -22,9 +22,9 @@ pub struct Item {
     pub answer_id: Option<u64>,
     pub answer_count: Option<u32>,
     pub score: u32,
-    pub last_activity_date: u128,
-    pub creation_date: u128,
-    pub last_edit_date: Option<u128>,
+    pub last_activity_date: u64,
+    pub creation_date: u64,
+    pub last_edit_date: Option<u64>,
     pub question_id: u128,
     pub content_license: Option<String>,
     pub link: Option<String>,
@@ -132,21 +132,24 @@ impl Answers {
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct ResponseTime {
-    creation_date: u128,
-    response_date: u128,
+    creation_date: u64,
+    response_date: u64,
     team_answered: bool,
 }
 impl ResponseTime {
-    pub fn new(creation_date: u128, response_date: u128, team_answered: bool) -> Self {
+    pub fn new(creation_date: u64, response_date: u64, team_answered: bool) -> Self {
         ResponseTime { creation_date, response_date, team_answered}
     }
-    pub fn set_response_date(&mut self, new_response_date_value: u128) {
+    pub fn set_response_date(&mut self, new_response_date_value: u64) {
         self.response_date = new_response_date_value;
     }
     pub fn set_team_answered(&mut self, new_team_answered_value: bool) {
         self.team_answered = new_team_answered_value;
     }
-    pub fn time_response(&self) -> u128 {
-        self.creation_date - self.response_date
+    pub fn get_team_answered(&self) -> bool {
+        self.team_answered
+    }
+    pub fn time_response(&self) -> u64 {
+        self.response_date - self.creation_date
     }
 }

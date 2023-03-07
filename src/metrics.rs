@@ -1,4 +1,7 @@
-use crate::{primitives::{TeamAnswers, GlobalAnswers, Tag, MemberAnswer, ResponseTime}};
+use crate::{
+    primitives::{TeamAnswers, GlobalAnswers, Tag, MemberAnswer, Answers}, 
+    utils::get_epoch_in_hr,
+};
 
 pub fn print_title(date_start: &String, date_end: &String, site: &String)  {
     println!("-- Questions on {} from {} to {} --", &site, &date_start, &date_end);
@@ -37,10 +40,24 @@ pub fn print_ratios(global_data: &GlobalAnswers, team_data: &TeamAnswers)  {
     println!();
 }
 
-pub fn print_response_times(time_response_questions: &Vec<ResponseTime>)  {
+pub fn print_response_times(answers: &Answers)  {
     println!("------ Team Response Times ------");
     println!();
-    println!("{:?} ", time_response_questions);
+    let mut total_time_response: u64 = 0;
+    let mut total_team_time_response: u64 = 0;
+    let time_response_questions = answers.time_response_questions();
+    for time_response in time_response_questions {
+        if time_response.get_team_answered() {
+            total_team_time_response += time_response.time_response();
+        }
+        total_time_response += time_response.time_response();
+    }
+    let average_total_response = total_time_response as f64 / time_response_questions.len() as f64;
+    println!("Average time of response {:?} ", get_epoch_in_hr(average_total_response));
+
+    let average_team_response = total_team_time_response as f64 / *answers.team_answers().answers() as f64;
+    println!("Average time of team response {:?} ", get_epoch_in_hr(average_team_response));  
+
     println!();
 }
 
@@ -49,7 +66,7 @@ pub fn print_individual_data(team_answered_questions: &Vec<MemberAnswer>)  {
     println!();
     let mut sorted_list = team_answered_questions.clone();
     sorted_list.sort_by(|a, b| b.count.cmp(&a.count));
-    for member in  sorted_list{ 
+    for member in sorted_list{ 
         println!("User {:?} -- Questions: {:?}", member.user_id, member.count); 
     }
     println!();
