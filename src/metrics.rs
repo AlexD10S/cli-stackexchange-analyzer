@@ -50,7 +50,7 @@ pub fn print_individual_data(team_answered_questions: &Vec<MemberAnswer>)  {
 
 pub fn print_tags(global_data: &GlobalAnswers,)  {
     const HOT_EMOJI: char = '\u{1F525}';
-    println!("------ Hot Tags {:?} {:?}------", HOT_EMOJI, HOT_EMOJI );
+    println!("------{:?} {:?} Hot Tags {:?} {:?}------", HOT_EMOJI, HOT_EMOJI, HOT_EMOJI, HOT_EMOJI );
     println!();
     println!("--- Total tags ---");
     print_list(&global_data.tags_total());

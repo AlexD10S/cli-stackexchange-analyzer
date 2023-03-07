@@ -37,5 +37,6 @@ cargo run -- substrate 02/03/2023 06/03/2023 --tags
 
 ### API KEY
 If you have an API KEY to do queries to the StackExchange API: https://api.stackexchange.com/docs 
-Create a .env file and add the variable API_KEY with your key like in the .env.example file
+
+Create a `.env` file and add the variable `API_KEY` with your key like in the `.env.example` file
 This allows you to do more queries

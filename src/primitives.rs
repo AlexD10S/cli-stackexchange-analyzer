@@ -71,14 +71,6 @@ impl GlobalAnswers {
     pub fn tags_unanswered(&self) -> &Vec<Tag> {
         &self.tags_unanswered
     }
-    pub fn add_tags(&self, vec_tags_total: Vec<Tag>,  vec_tags_unanswered: Vec<Tag>) -> Self{
-        Self {
-            total_questions:  self.total_questions,
-            total_unanswered: self.total_unanswered,
-            tags_total: vec_tags_total,
-            tags_unanswered: vec_tags_unanswered
-        }
-    }
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
