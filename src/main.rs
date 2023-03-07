@@ -43,6 +43,8 @@ async fn main() {
             metrics::print_individual_data(&team_data.individual_answers());
         }
         metrics::print_ratios(&global_data, &team_data.team_answers());
+
+        metrics::print_response_times(&team_data.time_response_questions());
     }
 
     if options.tags {

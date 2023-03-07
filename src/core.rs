@@ -1,4 +1,4 @@
-use crate::{primitives::{APIResponse, Item, TeamAnswers, GlobalAnswers, Options, Tag, MemberAnswer, Answers}, api};
+use crate::{primitives::{APIResponse, Item, TeamAnswers, GlobalAnswers, Options, Tag, MemberAnswer, Answers, ResponseTime}, api};
 
 pub async fn collect_global_data(questions: Vec<Item>, options: &Options) -> GlobalAnswers  {
     let total_questions = questions.len();
@@ -24,20 +24,37 @@ pub async fn collect_global_data(questions: Vec<Item>, options: &Options) -> Glo
 pub async fn collect_team_data(questions: Vec<Item>, site: &String, members: &Vec<u32>, options: &Options) -> Answers  {
     let mut answers_by_member = Vec::new();
     let mut team_answered =  TeamAnswers::new(0,0,0);
+    let mut time_response_questions: Vec<ResponseTime> = Vec::new();
+
     for question in &questions {
         if question.is_answered.unwrap() {
+            let mut response_time: ResponseTime = ResponseTime::new(question.creation_date, 0, false);
+
             let answers: APIResponse = api::get_answers(question.question_id, site).await;
-            team_answered = team_answered.question_answered(parse_answers(answers, &mut answers_by_member, members, options));
+
+            let team_answers: TeamAnswers = parse_answers(answers, &mut answers_by_member, members, &mut response_time, options);
+            team_answered = team_answered.question_answered(team_answers);
+
+            time_response_questions.push(response_time);
         }
     }
-    let answers: Answers = Answers::new(team_answered, answers_by_member);
+    let answers: Answers = Answers::new(team_answered, answers_by_member, time_response_questions);
     return answers
 }
 
-fn parse_answers(answers: APIResponse, answers_by_member_vec: &mut Vec<MemberAnswer>,team_members: &Vec<u32>, options: &Options) ->  TeamAnswers {
+fn parse_answers(answers: APIResponse, answers_by_member_vec: &mut Vec<MemberAnswer>,team_members: &Vec<u32>, response_time: &mut ResponseTime, options: &Options) ->  TeamAnswers {
     let mut team_answered =  TeamAnswers::new(0,0,0);
+    let mut set_time_set = true;
     for answer in &answers.items {
+        // From API is already sorted by time of response
+        if set_time_set {
+            response_time.set_response_date(answer.creation_date);
+            set_time_set = false;
+        }
         if team_members.contains(&answer.owner.user_id)  {
+            // For the team force it anyway
+            response_time.set_response_date(answer.creation_date);
+            response_time.set_team_answered(true);
             if options.individual {
                 add_member_response(answers_by_member_vec, &answer.owner.user_id);
             }

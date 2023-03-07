@@ -109,17 +109,44 @@ impl TeamAnswers {
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Answers {
-    pub team_answers: TeamAnswers,
-    pub individual_answers: Vec<MemberAnswer>,
+    team_answers: TeamAnswers,
+    individual_answers: Vec<MemberAnswer>,
+    time_response_questions: Vec<ResponseTime>
 }
 impl Answers {
-    pub fn new(team_answers: TeamAnswers, individual_answers: Vec<MemberAnswer>) -> Self {
-        Answers { team_answers, individual_answers}
+    pub fn new(team_answers: TeamAnswers, 
+        individual_answers: Vec<MemberAnswer>, 
+        time_response_questions: Vec<ResponseTime>) -> Self {
+        Answers { team_answers, individual_answers, time_response_questions}
     }
     pub fn team_answers(&self) -> &TeamAnswers {
         &self.team_answers
     }
     pub fn individual_answers(&self) -> &Vec<MemberAnswer> {
         &self.individual_answers
+    }
+    pub fn time_response_questions(&self) -> &Vec<ResponseTime> {
+        &self.time_response_questions
+    }
+}
+
+#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct ResponseTime {
+    creation_date: u128,
+    response_date: u128,
+    team_answered: bool,
+}
+impl ResponseTime {
+    pub fn new(creation_date: u128, response_date: u128, team_answered: bool) -> Self {
+        ResponseTime { creation_date, response_date, team_answered}
+    }
+    pub fn set_response_date(&mut self, new_response_date_value: u128) {
+        self.response_date = new_response_date_value;
+    }
+    pub fn set_team_answered(&mut self, new_team_answered_value: bool) {
+        self.team_answered = new_team_answered_value;
+    }
+    pub fn time_response(&self) -> u128 {
+        self.creation_date - self.response_date
     }
 }

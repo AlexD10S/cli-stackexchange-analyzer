@@ -1,4 +1,4 @@
-use crate::{primitives::{TeamAnswers, GlobalAnswers, Tag, MemberAnswer}};
+use crate::{primitives::{TeamAnswers, GlobalAnswers, Tag, MemberAnswer, ResponseTime}};
 
 pub fn print_title(date_start: &String, date_end: &String, site: &String)  {
     println!("-- Questions on {} from {} to {} --", &site, &date_start, &date_end);
@@ -34,6 +34,13 @@ pub fn print_ratios(global_data: &GlobalAnswers, team_data: &TeamAnswers)  {
 
     let float_division_answered_team= *team_data.answers() as f64 / questions_answered as f64; 
     println!("{:?} % answered by the team over answered questions", float_division_answered_team * 100 as f64);
+    println!();
+}
+
+pub fn print_response_times(time_response_questions: &Vec<ResponseTime>)  {
+    println!("------ Team Response Times ------");
+    println!();
+    println!("{:?} ", time_response_questions);
     println!();
 }
 
