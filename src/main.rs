@@ -30,7 +30,6 @@ async fn main() {
     let options = primitives::Options { tags: args.tags, individual: args.individual};
 
     let questions = api::get_questions(&period, &args.site).await;
-    println!("{:?}", questions);
 
     metrics::print_title(&args.date_start, &args.date_end, &args.site);
     

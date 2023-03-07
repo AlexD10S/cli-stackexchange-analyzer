@@ -41,7 +41,8 @@ pub fn print_ratios(global_data: &GlobalAnswers, team_data: &TeamAnswers)  {
 }
 
 pub fn print_response_times(answers: &Answers)  {
-    println!("------ Team Response Times ------");
+    const TIMER_EMOJI: char = '\u{23F2}';
+    println!("------{:?} {:?} Team Response Times {:?} {:?}------", TIMER_EMOJI, TIMER_EMOJI, TIMER_EMOJI, TIMER_EMOJI);
     println!();
     let mut total_time_response: u64 = 0;
     let mut total_team_time_response: u64 = 0;
@@ -53,10 +54,10 @@ pub fn print_response_times(answers: &Answers)  {
         total_time_response += time_response.time_response();
     }
     let average_total_response = total_time_response as f64 / time_response_questions.len() as f64;
-    println!("Average time of response {:?} ", get_epoch_in_hr(average_total_response));
+    println!("The average time of response is around {:?} hours", get_epoch_in_hr(average_total_response));
 
     let average_team_response = total_team_time_response as f64 / *answers.team_answers().answers() as f64;
-    println!("Average time of team response {:?} ", get_epoch_in_hr(average_team_response));  
+    println!("The average time of team response is around {:?} hours", get_epoch_in_hr(average_team_response));  
 
     println!();
 }
@@ -77,9 +78,11 @@ pub fn print_tags(global_data: &GlobalAnswers,)  {
     println!("------{:?} {:?} Hot Tags {:?} {:?}------", HOT_EMOJI, HOT_EMOJI, HOT_EMOJI, HOT_EMOJI );
     println!();
     println!("--- Total tags ---");
+    println!();
     print_list(&global_data.tags_total());
     println!();
     println!("--- Unanswered tags ---");
+    println!();
     print_list(&global_data.tags_unanswered());
     println!();
 }
@@ -90,6 +93,6 @@ fn print_list(tags_vec: &Vec<Tag>)  {
     let mut sorted_list = tags_vec.clone();
     sorted_list.sort_by(|a, b| b.count.cmp(&a.count));
     for n in 0..NUMBER_OF_HOT_TAGS { 
-        println!("{:?} -- Number of questions with this Tag: {:?}", sorted_list[n].name.to_string(), sorted_list[n].count); 
+        println!("Tag: {:?}, used in {:?} questions", sorted_list[n].name.to_string(), sorted_list[n].count); 
     }
 }
