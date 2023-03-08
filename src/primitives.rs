@@ -22,7 +22,7 @@ pub struct Item {
     pub accepted_answer_id: Option<u64>,
     pub answer_id: Option<u64>,
     pub answer_count: Option<u32>,
-    pub score: u32,
+    pub score: i32,
     pub last_activity_date: u64,
     pub creation_date: u64,
     pub last_edit_date: Option<u64>,
@@ -82,17 +82,17 @@ pub struct MemberAnswer {
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct TeamAnswers {
     answers: u32,
-    score: u32,
+    score: i32, // Score can be negative
     accepted: u32,
 }
 impl TeamAnswers {
-    pub fn new(answers: u32, score: u32, accepted: u32) -> Self {
+    pub fn new(answers: u32, score: i32, accepted: u32) -> Self {
         TeamAnswers { answers, score, accepted}
     }
     pub fn answers(&self) -> &u32 {
         &self.answers
     }
-    pub fn score(&self) -> &u32 {
+    pub fn score(&self) -> &i32 {
         &self.score
     }
     pub fn accepted(&self) -> &u32 {
