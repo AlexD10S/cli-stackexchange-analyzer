@@ -1,7 +1,12 @@
 use crate::{
     primitives::{TeamAnswers, GlobalAnswers, Tag, MemberAnswer, Answers, UnanswerQuestions}, 
-    utils::get_epoch_in_hr,
+    dates::get_epoch_in_hr,
+    utils::{add_member_response}
 };
+
+const NUMBER_OF_HOT_TAGS: usize = 3;
+const TIMER_EMOJI: char = '\u{23F2}';
+const HOT_EMOJI: char = '\u{1F525}';
 
 pub fn print_title(date_start: &String, date_end: &String, site: &String)  {
     println!("-- Questions on {} from {} to {} --", &site, &date_start, &date_end);
@@ -41,7 +46,6 @@ pub fn print_ratios(global_data: &GlobalAnswers, team_data: &TeamAnswers)  {
 }
 
 pub fn print_response_times(answers: &Answers)  {
-    const TIMER_EMOJI: char = '\u{23F2}';
     println!("------{:?} {:?} Team Response Times {:?} {:?}------", TIMER_EMOJI, TIMER_EMOJI, TIMER_EMOJI, TIMER_EMOJI);
     println!();
     let mut total_time_response: u64 = 0;
@@ -100,21 +104,8 @@ pub fn print_unanswered_analysed(unanswered_data: &Vec<UnanswerQuestions>, globa
     println!("Real Unanswered questions on this period: {:?} ", global_data.total_unanswered() - answered);
     println!();
 }
-fn add_member_response(answers_by_member_vec: &mut Vec<MemberAnswer>, member_id: &u32) {
-    let exists = answers_by_member_vec.iter().find(|&x| x.user_id == *member_id).is_some();
-    if exists {
-        let existing_member_index = answers_by_member_vec.iter().position(|x| x.user_id == *member_id).unwrap();
-        let count = answers_by_member_vec[existing_member_index].count;
-        answers_by_member_vec[existing_member_index] = MemberAnswer {user_id: *member_id, count: count + 1}
-    }
-    else {
-        answers_by_member_vec.push(MemberAnswer{user_id: *member_id, count: 1});
-    }
-}
-
 
 pub fn print_tags(global_data: &GlobalAnswers,)  {
-    const HOT_EMOJI: char = '\u{1F525}';
     println!("------{:?} {:?} Hot Tags {:?} {:?}------", HOT_EMOJI, HOT_EMOJI, HOT_EMOJI, HOT_EMOJI );
     println!();
     println!("--- Total tags ---");
@@ -128,8 +119,6 @@ pub fn print_tags(global_data: &GlobalAnswers,)  {
 }
 
 fn print_list(tags_vec: &Vec<Tag>)  {
-    const NUMBER_OF_HOT_TAGS: usize = 3;
-
     let mut sorted_list = tags_vec.clone();
     sorted_list.sort_by(|a, b| b.count.cmp(&a.count));
     for n in 0..NUMBER_OF_HOT_TAGS { 

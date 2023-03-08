@@ -10,6 +10,7 @@ Run:
 ```shell
 cargo run -- site date_start date_end
 ```
+The format of the date is dd/mm/YYYY 
 
 Example:
 ```shell
