@@ -41,7 +41,7 @@ pub async fn collect_team_data(questions: Vec<Item>, site: &String, members: &Ve
             time_response_questions.push(response_time);
         }
         if !question.is_answered.unwrap() && options.unanswered {
-            let unanswered_question: UnanswerQuestions = analyse_unanswered_question(question.question_id, site, members).await;
+            let unanswered_question: UnanswerQuestions = analyse_unanswered_question(question.question_id, site, members, options).await;
             unanswered_questions.push(unanswered_question);
         }
     }
@@ -76,17 +76,21 @@ fn parse_answers(answers: APIResponse, answers_by_member_vec: &mut Vec<MemberAns
     return team_answered;
 }
 
-async fn analyse_unanswered_question(question_id: u128, site: &String, team_members: &Vec<u32>) -> UnanswerQuestions {
+async fn analyse_unanswered_question(question_id: u128, site: &String, team_members: &Vec<u32>, options: &Options) -> UnanswerQuestions {
     let answers: APIResponse = api::get_answers(question_id, site).await;
     let mut answered = false;
     let mut answered_by_team = false;
+    let mut user_id: u32 = 0;
     for answer in &answers.items {
         answered = true;
         if team_members.contains(&answer.owner.user_id)  {
             answered_by_team = true;
+            if options.individual {
+                user_id = answer.owner.user_id;
+            }
         }
     }
-    UnanswerQuestions {answered, answered_by_team}
+    UnanswerQuestions {answered, answered_by_team, user_id}
 }
 
 fn add_tags(tags_vec: &mut Vec<Tag>, question_tags: &Vec<String>) {

@@ -164,4 +164,5 @@ impl ResponseTime {
 pub struct UnanswerQuestions {
     pub answered: bool,
     pub answered_by_team: bool,
+    pub user_id: u32, 
 }

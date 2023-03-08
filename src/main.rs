@@ -49,7 +49,7 @@ async fn main() {
         metrics::print_response_times(&team_data);
 
         if options.unanswered {
-            metrics::print_unanswered_analysed(&team_data.unanswered_questions());
+            metrics::print_unanswered_analysed(&team_data.unanswered_questions(), &global_data);
         }
     }
 

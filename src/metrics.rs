@@ -73,26 +73,43 @@ pub fn print_individual_data(team_answered_questions: &Vec<MemberAnswer>)  {
     println!();
 }
 
-pub fn print_unanswered_analysed(unanswered_data: &Vec<UnanswerQuestions>)  {
+pub fn print_unanswered_analysed(unanswered_data: &Vec<UnanswerQuestions>, global_data: &GlobalAnswers)  {
     println!("------ Unanswered Questions Analysed------");
     println!();
     println!("From the {:?} Unanswered Questions:", unanswered_data.len()); 
     let mut answered = 0;
     let mut answered_by_team = 0;
+    let mut answers_by_member: Vec<MemberAnswer> = Vec::new();
     for unanswered_question in unanswered_data{ 
        if unanswered_question.answered {
         answered += 1;
        }
        if unanswered_question.answered_by_team {
         answered_by_team += 1;
+        add_member_response(&mut answers_by_member, &unanswered_question.user_id);
        }
     }
     println!("{:?} has an answer with 0 score", answered);
     println!("In {:?} of them a team member answer it", answered_by_team); 
-    if unanswered_data.len() - answered  == 0 {
-        println!("{:?}  hasn't been answered at all", unanswered_data.len() - answered); 
+    let mut sorted_list = answers_by_member.clone();
+    sorted_list.sort_by(|a, b| b.count.cmp(&a.count));
+    for member in sorted_list{ 
+        println!("User {:?} has answered {:?} of the unanswered(with 0 score) questions", member.user_id, member.count); 
     }
     println!();
+    println!("Real Unanswered questions on this period: {:?} ", global_data.total_unanswered() - answered);
+    println!();
+}
+fn add_member_response(answers_by_member_vec: &mut Vec<MemberAnswer>, member_id: &u32) {
+    let exists = answers_by_member_vec.iter().find(|&x| x.user_id == *member_id).is_some();
+    if exists {
+        let existing_member_index = answers_by_member_vec.iter().position(|x| x.user_id == *member_id).unwrap();
+        let count = answers_by_member_vec[existing_member_index].count;
+        answers_by_member_vec[existing_member_index] = MemberAnswer {user_id: *member_id, count: count + 1}
+    }
+    else {
+        answers_by_member_vec.push(MemberAnswer{user_id: *member_id, count: 1});
+    }
 }
 
 
