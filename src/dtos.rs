@@ -29,12 +29,12 @@ pub struct Item {
 }
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Owner {
-    account_id: u32,
-    reputation: u64,
-    pub user_id: u32,
+    account_id: Option<u32>,
+    reputation: Option<u64>,
+    pub user_id: Option<u32>,
     user_type: String,
-    profile_image: String,
-    display_name: String,
-    link: String,
+    profile_image: Option<String>,
+    display_name: Option<String>,
+    link: Option<String>,
     accept_rate: Option<u64>
 }

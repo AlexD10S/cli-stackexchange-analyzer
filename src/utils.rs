@@ -9,12 +9,12 @@ pub fn parse_answers(answers: APIResponse, answers_by_member_vec: &mut Vec<Membe
             response_time.set_response_date(answer.creation_date);
             set_time_set = false;
         }
-        if team_members.contains(&answer.owner.user_id)  {
+        if team_members.contains(&answer.owner.user_id.unwrap_or(0))  {
             // For the team force it anyway
             response_time.set_response_date(answer.creation_date);
             response_time.set_team_answered(true);
             if options.individual {
-                add_member_response(answers_by_member_vec, &answer.owner.user_id);
+                add_member_response(answers_by_member_vec, &answer.owner.user_id.unwrap_or(0));
             }
             let aux = TeamAnswers::new(
                 1, answer.score, answer.is_accepted.unwrap_or(false) as u32

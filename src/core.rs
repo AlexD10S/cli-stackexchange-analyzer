@@ -59,10 +59,10 @@ async fn analyse_unanswered_question(question_id: u128, site: &String, team_memb
     let mut user_id: u32 = 0;
     for answer in &answers.items {
         answered = true;
-        if team_members.contains(&answer.owner.user_id)  {
+        if team_members.contains(&answer.owner.user_id.unwrap_or(0))  {
             answered_by_team = true;
             if options.individual {
-                user_id = answer.owner.user_id;
+                user_id = answer.owner.user_id.unwrap_or(0);
             }
         }
     }
