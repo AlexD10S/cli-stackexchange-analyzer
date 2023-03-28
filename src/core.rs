@@ -1,5 +1,5 @@
 use crate::{primitives::{
-    TeamAnswers, GlobalAnswers, Options, Answers, ResponseTime, UnanswerQuestions},
+    TeamAnswers, GlobalAnswers, Options, Answers, ResponseTime},
     dtos::{APIResponse, Item}, 
     api, 
     utils::{parse_answers, add_tags}
@@ -30,7 +30,6 @@ pub async fn collect_team_data(questions: Vec<Item>, site: &String, members: &Ve
     let mut answers_by_member = Vec::new();
     let mut team_answered =  TeamAnswers::new(0,0,0);
     let mut time_response_questions: Vec<ResponseTime> = Vec::new();
-    let mut unanswered_questions: Vec<UnanswerQuestions> = Vec::new();
 
     for question in &questions {
         if question.is_answered.unwrap() || (!question.is_answered.unwrap() && question.answer_count.unwrap() > 0) {
@@ -43,28 +42,7 @@ pub async fn collect_team_data(questions: Vec<Item>, site: &String, members: &Ve
 
             time_response_questions.push(response_time);
         }
-        // if !question.is_answered.unwrap() && options.unanswered {
-        //     let unanswered_question: UnanswerQuestions = analyse_unanswered_question(question.question_id, site, members, options).await;
-        //     unanswered_questions.push(unanswered_question);
-        // }
     }
-    let answers: Answers = Answers::new(team_answered, answers_by_member, time_response_questions, unanswered_questions);
+    let answers: Answers = Answers::new(team_answered, answers_by_member, time_response_questions);
     return answers
-}
-
-async fn analyse_unanswered_question(question_id: u128, site: &String, team_members: &Vec<u32>, options: &Options) -> UnanswerQuestions {
-    let answers: APIResponse = api::get_answers(question_id, site).await;
-    let mut answered = false;
-    let mut answered_by_team = false;
-    let mut user_id: u32 = 0;
-    for answer in &answers.items {
-        answered = true;
-        if team_members.contains(&answer.owner.user_id.unwrap_or(0))  {
-            answered_by_team = true;
-            if options.individual {
-                user_id = answer.owner.user_id.unwrap_or(0);
-            }
-        }
-    }
-    UnanswerQuestions {answered, answered_by_team, user_id}
 }

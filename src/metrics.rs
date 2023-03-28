@@ -1,7 +1,6 @@
 use crate::{
-    primitives::{TeamAnswers, GlobalAnswers, Tag, MemberAnswer, Answers, UnanswerQuestions}, 
-    dates::get_epoch_in_hr,
-    utils::{add_member_response}
+    primitives::{TeamAnswers, GlobalAnswers, Tag, MemberAnswer, Answers}, 
+    dates::get_epoch_in_hr
 };
 
 const NUMBER_OF_HOT_TAGS: usize = 3;
@@ -74,34 +73,6 @@ pub fn print_individual_data(team_answered_questions: &Vec<MemberAnswer>)  {
     for member in sorted_list{ 
         println!("User {:?} -- Questions: {:?}", member.user_id, member.count); 
     }
-    println!();
-}
-
-pub fn print_unanswered_analysed(unanswered_data: &Vec<UnanswerQuestions>, global_data: &GlobalAnswers)  {
-    println!("------ Unanswered Questions Analysed------");
-    println!();
-    println!("From the {:?} Unanswered Questions:", unanswered_data.len()); 
-    let mut answered = 0;
-    let mut answered_by_team = 0;
-    let mut answers_by_member: Vec<MemberAnswer> = Vec::new();
-    for unanswered_question in unanswered_data{ 
-       if unanswered_question.answered {
-        answered += 1;
-       }
-       if unanswered_question.answered_by_team {
-        answered_by_team += 1;
-        add_member_response(&mut answers_by_member, &unanswered_question.user_id);
-       }
-    }
-    println!("{:?} has an answer with 0 score", answered);
-    println!("In {:?} of them a team member answer it", answered_by_team); 
-    let mut sorted_list = answers_by_member.clone();
-    sorted_list.sort_by(|a, b| b.count.cmp(&a.count));
-    for member in sorted_list{ 
-        println!("User {:?} has answered {:?} of the unanswered(with 0 score) questions", member.user_id, member.count); 
-    }
-    println!();
-    println!("Real Unanswered questions on this period: {:?} ", global_data.total_unanswered() - answered);
     println!();
 }
 

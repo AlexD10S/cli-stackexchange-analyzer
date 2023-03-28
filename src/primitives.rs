@@ -76,14 +76,12 @@ pub struct Answers {
     team_answers: TeamAnswers,
     individual_answers: Vec<MemberAnswer>,
     time_response_questions: Vec<ResponseTime>,
-    unanswered_questions: Vec<UnanswerQuestions>,
 }
 impl Answers {
     pub fn new(team_answers: TeamAnswers, 
         individual_answers: Vec<MemberAnswer>, 
-        time_response_questions: Vec<ResponseTime>,
-        unanswered_questions: Vec<UnanswerQuestions>) -> Self {
-        Answers { team_answers, individual_answers, time_response_questions, unanswered_questions}
+        time_response_questions: Vec<ResponseTime>) -> Self {
+        Answers { team_answers, individual_answers, time_response_questions}
     }
     pub fn team_answers(&self) -> &TeamAnswers {
         &self.team_answers
@@ -94,9 +92,6 @@ impl Answers {
     pub fn time_response_questions(&self) -> &Vec<ResponseTime> {
         &self.time_response_questions
     }
-    pub fn unanswered_questions(&self) -> &Vec<UnanswerQuestions> {
-        &self.unanswered_questions
-    } 
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
