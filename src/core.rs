@@ -12,7 +12,7 @@ pub async fn collect_global_data(questions: Vec<Item>, options: &Options) -> Glo
     let mut tags_unanswered = Vec::new();
    
     for question in &questions {
-        if !question.is_answered.unwrap() {
+        if !question.is_answered.unwrap() && question.answer_count.unwrap() == 0 {
             total_unanswered += 1;
             if question.tags.is_some() && options.tags { 
                 add_tags(&mut tags_unanswered, question.tags.as_ref().unwrap());
@@ -33,7 +33,7 @@ pub async fn collect_team_data(questions: Vec<Item>, site: &String, members: &Ve
     let mut unanswered_questions: Vec<UnanswerQuestions> = Vec::new();
 
     for question in &questions {
-        if question.is_answered.unwrap() {
+        if question.is_answered.unwrap() || (!question.is_answered.unwrap() && question.answer_count.unwrap() > 0) {
             let mut response_time: ResponseTime = ResponseTime::new(question.creation_date, 0, false);
 
             let answers: APIResponse = api::get_answers(question.question_id, site).await;
@@ -43,10 +43,10 @@ pub async fn collect_team_data(questions: Vec<Item>, site: &String, members: &Ve
 
             time_response_questions.push(response_time);
         }
-        if !question.is_answered.unwrap() && options.unanswered {
-            let unanswered_question: UnanswerQuestions = analyse_unanswered_question(question.question_id, site, members, options).await;
-            unanswered_questions.push(unanswered_question);
-        }
+        // if !question.is_answered.unwrap() && options.unanswered {
+        //     let unanswered_question: UnanswerQuestions = analyse_unanswered_question(question.question_id, site, members, options).await;
+        //     unanswered_questions.push(unanswered_question);
+        // }
     }
     let answers: Answers = Answers::new(team_answered, answers_by_member, time_response_questions, unanswered_questions);
     return answers

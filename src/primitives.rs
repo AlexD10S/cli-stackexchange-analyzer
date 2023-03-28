@@ -4,7 +4,6 @@ use serde::{Deserialize, Serialize};
 pub struct Options {
     pub tags: bool,
     pub individual: bool,
-    pub unanswered: bool,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
