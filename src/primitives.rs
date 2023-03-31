@@ -117,10 +117,3 @@ impl ResponseTime {
         self.response_date - self.creation_date
     }
 }
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub struct UnanswerQuestions {
-    pub answered: bool,
-    pub answered_by_team: bool,
-    pub user_id: u32, 
-}
