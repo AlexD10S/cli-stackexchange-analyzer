@@ -2,7 +2,7 @@ use crate::{primitives::{
     TeamAnswers, GlobalData, CliOptions, Answers, ResponseTime},
     api::dtos::{APIResponse, Item}, 
     api::stackexchange_api, 
-    utils::utils::{parse_answers, add_tags}
+    utils::parser::{parse_answers, parse_and_add_tags}
 };
 
 pub async fn collect_global_data(questions: Vec<Item>, options: &CliOptions) -> GlobalData  {
@@ -15,11 +15,11 @@ pub async fn collect_global_data(questions: Vec<Item>, options: &CliOptions) -> 
         if !question.is_answered.unwrap() && question.answer_count.unwrap() == 0 {
             total_unanswered += 1;
             if question.tags.is_some() && options.tags { 
-                add_tags(&mut tags_unanswered, question.tags.as_ref().unwrap());
+                parse_and_add_tags(&mut tags_unanswered, question.tags.as_ref().unwrap());
             }
         }
         if options.tags {
-            add_tags(&mut tags_total, question.tags.as_ref().unwrap());
+            parse_and_add_tags(&mut tags_total, question.tags.as_ref().unwrap());
         }
     }
     let global_data =  GlobalData::new(total_questions, total_unanswered, tags_total, tags_unanswered);

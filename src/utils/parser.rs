@@ -26,7 +26,7 @@ pub fn parse_answers(answers: APIResponse, answers_by_member_vec: &mut Vec<Membe
     return team_answered;
 }
 
-pub fn add_member_response(answers_by_member_vec: &mut Vec<MemberAnswer>, member_id: &u32) {
+fn add_member_response(answers_by_member_vec: &mut Vec<MemberAnswer>, member_id: &u32) {
     let exists = answers_by_member_vec.iter().find(|&x| x.user_id == *member_id).is_some();
     if exists {
         let existing_member_index = answers_by_member_vec.iter().position(|x| x.user_id == *member_id).unwrap();
@@ -38,7 +38,7 @@ pub fn add_member_response(answers_by_member_vec: &mut Vec<MemberAnswer>, member
     }
 }
 
-pub fn add_tags(tags_vec: &mut Vec<Tag>, question_tags: &Vec<String>) {
+pub fn parse_and_add_tags(tags_vec: &mut Vec<Tag>, question_tags: &Vec<String>) {
     for tag in question_tags {
         let exists = tags_vec.iter().find(|&x| x.name == tag.to_string()).is_some();
         if exists {
