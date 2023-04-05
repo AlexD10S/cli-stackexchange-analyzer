@@ -1,5 +1,5 @@
 use crate::{
-    primitives::{TeamAnswers, GlobalAnswers, Tag, MemberAnswer, Answers}, 
+    primitives::{TeamAnswers, GlobalData, Tag, MemberAnswer, Answers, CliOptions}, 
     dates::get_epoch_in_hr
 };
 
@@ -7,12 +7,32 @@ const NUMBER_OF_HOT_TAGS: usize = 3;
 const TIMER_EMOJI: char = '\u{23F2}';
 const HOT_EMOJI: char = '\u{1F525}';
 
-pub fn print_title(date_start: &String, date_end: &String, site: &String)  {
+pub fn print_data(date_start: &String, date_end: &String, options: &CliOptions, global_data: &GlobalData, answers: Option<Answers> )  {
+    print_title(&date_start, &date_end, &options.site);
+    print_global_data(&global_data);
+    
+    if let Some(team_data) = &answers {
+        print_team_data(&team_data.team_answers());
+
+        if options.individual {
+           print_individual_data(&team_data.individual_answers());
+        }
+
+        print_ratios(&global_data, &team_data.team_answers());
+        print_response_times(&team_data);
+    }
+
+    if options.tags {
+        print_tags(&global_data);
+    }
+}
+
+fn print_title(date_start: &String, date_end: &String, site: &String)  {
     println!("-- Questions on {} from {} to {} --", &site, &date_start, &date_end);
     println!();
 }
 
-pub fn print_global_data(global_data: &GlobalAnswers)  {
+fn print_global_data(global_data: &GlobalData)  {
     println!("------ Global Metrics ------");
     println!();
     println!("Number of questions on this period: {:?} ", global_data.total_questions());
@@ -20,7 +40,7 @@ pub fn print_global_data(global_data: &GlobalAnswers)  {
     println!();
 }
 
-pub fn print_team_data(team_answered_questions: &TeamAnswers)  {
+fn print_team_data(team_answered_questions: &TeamAnswers)  {
     println!("------ Team Metrics ------");
     println!();
     println!("Number of questions answered by team members: {:?} ", team_answered_questions.answers());
@@ -29,7 +49,7 @@ pub fn print_team_data(team_answered_questions: &TeamAnswers)  {
     println!();
 }
 
-pub fn print_ratios(global_data: &GlobalAnswers, team_data: &TeamAnswers)  {
+fn print_ratios(global_data: &GlobalData, team_data: &TeamAnswers)  {
     println!("------ Team Ratios ------");
     println!();
     let questions_answered = global_data.total_questions() - global_data.total_unanswered();
@@ -44,7 +64,7 @@ pub fn print_ratios(global_data: &GlobalAnswers, team_data: &TeamAnswers)  {
     println!();
 }
 
-pub fn print_response_times(answers: &Answers)  {
+fn print_response_times(answers: &Answers)  {
     println!("------{:?} {:?} Team Response Times {:?} {:?}------", TIMER_EMOJI, TIMER_EMOJI, TIMER_EMOJI, TIMER_EMOJI);
     println!();
     let mut total_time_response: u64 = 0;
@@ -65,7 +85,7 @@ pub fn print_response_times(answers: &Answers)  {
     println!();
 }
 
-pub fn print_individual_data(team_answered_questions: &Vec<MemberAnswer>)  {
+fn print_individual_data(team_answered_questions: &Vec<MemberAnswer>)  {
     println!("------ Individual Metrics ------");
     println!();
     let mut sorted_list = team_answered_questions.clone();
@@ -76,7 +96,7 @@ pub fn print_individual_data(team_answered_questions: &Vec<MemberAnswer>)  {
     println!();
 }
 
-pub fn print_tags(global_data: &GlobalAnswers,)  {
+fn print_tags(global_data: &GlobalData,)  {
     println!("------{:?} {:?} Hot Tags {:?} {:?}------", HOT_EMOJI, HOT_EMOJI, HOT_EMOJI, HOT_EMOJI );
     println!();
     println!("--- Total tags ---");

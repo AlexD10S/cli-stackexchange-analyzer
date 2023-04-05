@@ -31,30 +31,17 @@ async fn main() {
     let args = Cli::parse();
 
     let period = dates::get_period_in_ms(&args.date_start, &args.date_end);
-    let options = primitives::Options { tags: args.tags, individual: args.individual};
+    let options = primitives::CliOptions { tags: args.tags, individual: args.individual, site: args.site, period};
 
-    let questions = stackexchange_api::get_questions(&period, &args.site).await;
+    let questions = stackexchange_api::get_questions(&options).await;
 
-    printer::print_title(&args.date_start, &args.date_end, &args.site);
-    
     let global_data = core::collect_global_data(questions.clone(), &options).await;
-    printer::print_global_data(&global_data);
 
+    let mut team_data: Option<primitives::Answers> = None;
     if let Some(team_members) = &args.members {
-        let team_data = core::collect_team_data(questions, &args.site, team_members, &options).await;
-        printer::print_team_data(&team_data.team_answers());
-
-        if options.individual {
-            printer::print_individual_data(&team_data.individual_answers());
-        }
-
-        printer::print_ratios(&global_data, &team_data.team_answers());
-        printer::print_response_times(&team_data);
+       team_data = Some(core::collect_team_data(questions, team_members, &options).await);
     }
-
-    if options.tags {
-        printer::print_tags(&global_data);
-    }
+    printer::print_data(&args.date_start, &args.date_end, &options, &global_data, team_data);
     
 }
 

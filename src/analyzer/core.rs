@@ -1,11 +1,11 @@
 use crate::{primitives::{
-    TeamAnswers, GlobalAnswers, Options, Answers, ResponseTime},
+    TeamAnswers, GlobalData, CliOptions, Answers, ResponseTime},
     api::dtos::{APIResponse, Item}, 
     api::stackexchange_api, 
     utils::utils::{parse_answers, add_tags}
 };
 
-pub async fn collect_global_data(questions: Vec<Item>, options: &Options) -> GlobalAnswers  {
+pub async fn collect_global_data(questions: Vec<Item>, options: &CliOptions) -> GlobalData  {
     let total_questions = questions.len();
     let mut total_unanswered = 0;
     let mut tags_total = Vec::new();
@@ -22,11 +22,11 @@ pub async fn collect_global_data(questions: Vec<Item>, options: &Options) -> Glo
             add_tags(&mut tags_total, question.tags.as_ref().unwrap());
         }
     }
-    let global_data =  GlobalAnswers::new(total_questions, total_unanswered, tags_total, tags_unanswered);
+    let global_data =  GlobalData::new(total_questions, total_unanswered, tags_total, tags_unanswered);
     return global_data;
 }
 
-pub async fn collect_team_data(questions: Vec<Item>, site: &String, members: &Vec<u32>, options: &Options) -> Answers  {
+pub async fn collect_team_data(questions: Vec<Item>, members: &Vec<u32>, options: &CliOptions) -> Answers  {
     let mut answers_by_member = Vec::new();
     let mut team_answered =  TeamAnswers::new(0,0,0);
     let mut time_response_questions: Vec<ResponseTime> = Vec::new();
@@ -35,7 +35,7 @@ pub async fn collect_team_data(questions: Vec<Item>, site: &String, members: &Ve
         if question.is_answered.unwrap() || (!question.is_answered.unwrap() && question.answer_count.unwrap() > 0) {
             let mut response_time: ResponseTime = ResponseTime::new(question.creation_date, 0, false);
 
-            let answers: APIResponse = stackexchange_api::get_answers(question.question_id, site).await;
+            let answers: APIResponse = stackexchange_api::get_answers(question.question_id, &options.site).await;
 
             let team_answers: TeamAnswers = parse_answers(answers, &mut answers_by_member, members, &mut response_time, options);
             team_answered = team_answered.question_answered(team_answers);

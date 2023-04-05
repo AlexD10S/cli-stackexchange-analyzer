@@ -1,9 +1,13 @@
 // Primitives for the CLI program
 use serde::{Deserialize, Serialize};
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub struct Options {
+
+use crate::utils::dates::Period;
+#[derive(Default, Debug, Clone, PartialEq)]
+pub struct CliOptions {
     pub tags: bool,
     pub individual: bool,
+    pub site: String,
+    pub period: Period,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -13,15 +17,15 @@ pub struct Tag {
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub struct GlobalAnswers {
+pub struct GlobalData {
     total_questions: usize,
     total_unanswered: usize,
     tags_total: Vec<Tag>,
     tags_unanswered: Vec<Tag>,
 }
-impl GlobalAnswers {
+impl GlobalData {
     pub fn new(total_questions: usize, total_unanswered: usize, tags_total: Vec<Tag>, tags_unanswered: Vec<Tag>) -> Self {
-        GlobalAnswers { total_questions, total_unanswered, tags_total, tags_unanswered}
+        GlobalData { total_questions, total_unanswered, tags_total, tags_unanswered}
     }
     pub fn total_questions(&self) -> &usize {
         &self.total_questions
