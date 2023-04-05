@@ -6,7 +6,7 @@ mod analyzer;
 mod utils;
 mod api;
 
-use utils::{printer, dates};
+use utils::{printer, dates, exporter};
 use api::{stackexchange_api};
 use analyzer::{core, primitives};
 
@@ -21,6 +21,8 @@ struct Cli {
     tags: bool, //Collect tags info
     #[clap(long, short, action)]
     individual: bool, //Collect individual team members info
+    #[clap(long, short, action)]
+    export: bool, //Export the data in a csv file
 }
 
 #[tokio::main]
@@ -41,7 +43,14 @@ async fn main() {
     if let Some(team_members) = &args.members {
        team_data = Some(core::collect_team_data(questions, team_members, &options).await);
     }
-    printer::print_data(&args.date_start, &args.date_end, &options, &global_data, team_data);
+    
+    // Print or export data in a csv file
+    if args.export {
+        exporter::export_data(&args.date_start, &args.date_end, &options, &global_data, &team_data);
+    }
+    else {
+        printer::print_data(&args.date_start, &args.date_end, &options, &global_data, &team_data);
+    }
     
 }
 

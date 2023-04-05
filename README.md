@@ -39,10 +39,17 @@ cargo run -- substrate 02/03/2023 06/03/2023  --members 1 2 3 4 --individual
 ```
 
 ### Tags Metrics
-And also get the hot tags with the optional flag --tags:
+Also get the hot tags with the optional flag --tags:
 
 ```shell
 cargo run -- substrate 02/03/2023 06/03/2023 --tags
+```
+
+### Export metrics in a CSV
+And finally you can export the data in a CSV file instead of printing it in the console with the optional flag --export:
+
+```shell
+cargo run -- substrate 02/03/2023 06/03/2023 --export
 ```
 
 

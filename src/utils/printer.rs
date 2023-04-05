@@ -7,7 +7,7 @@ const NUMBER_OF_HOT_TAGS: usize = 3;
 const TIMER_EMOJI: char = '\u{23F2}';
 const HOT_EMOJI: char = '\u{1F525}';
 
-pub fn print_data(date_start: &String, date_end: &String, options: &CliOptions, global_data: &GlobalData, answers: Option<Answers> )  {
+pub fn print_data(date_start: &String, date_end: &String, options: &CliOptions, global_data: &GlobalData, answers: &Option<Answers> )  {
     print_title(&date_start, &date_end, &options.site);
     print_global_data(&global_data);
     
