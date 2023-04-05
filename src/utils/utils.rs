@@ -1,4 +1,4 @@
-use crate::{primitives::{MemberAnswer,TeamAnswers,ResponseTime, Tag, Options}, dtos::APIResponse};
+use crate::{primitives::{MemberAnswer,TeamAnswers,ResponseTime, Tag, Options}, api::dtos::APIResponse};
 
 pub fn parse_answers(answers: APIResponse, answers_by_member_vec: &mut Vec<MemberAnswer>,team_members: &Vec<u32>, response_time: &mut ResponseTime, options: &Options) ->  TeamAnswers {
     let mut team_answered =  TeamAnswers::new(0,0,0);

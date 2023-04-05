@@ -1,8 +1,8 @@
 use crate::{primitives::{
     TeamAnswers, GlobalAnswers, Options, Answers, ResponseTime},
-    dtos::{APIResponse, Item}, 
-    api, 
-    utils::{parse_answers, add_tags}
+    api::dtos::{APIResponse, Item}, 
+    api::stackexchange_api, 
+    utils::utils::{parse_answers, add_tags}
 };
 
 pub async fn collect_global_data(questions: Vec<Item>, options: &Options) -> GlobalAnswers  {
@@ -35,7 +35,7 @@ pub async fn collect_team_data(questions: Vec<Item>, site: &String, members: &Ve
         if question.is_answered.unwrap() || (!question.is_answered.unwrap() && question.answer_count.unwrap() > 0) {
             let mut response_time: ResponseTime = ResponseTime::new(question.creation_date, 0, false);
 
-            let answers: APIResponse = api::get_answers(question.question_id, site).await;
+            let answers: APIResponse = stackexchange_api::get_answers(question.question_id, site).await;
 
             let team_answers: TeamAnswers = parse_answers(answers, &mut answers_by_member, members, &mut response_time, options);
             team_answered = team_answered.question_answered(team_answers);

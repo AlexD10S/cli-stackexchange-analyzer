@@ -1,5 +1,5 @@
 # CLI StackExchange Analyser
-CLI tool to get metrics from a stackexchange site.
+CLI tool to get metrics from a stackexchange site built with Rust 🦀.
 
 Build:
 ```shell

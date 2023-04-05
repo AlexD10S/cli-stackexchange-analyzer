@@ -2,13 +2,13 @@ use clap::Parser;
 use serde::{Deserialize};
 use dotenv::dotenv;
 
-mod primitives;
-mod dtos;
-mod api;
-mod dates;
-mod core;
-mod metrics;
+mod analyzer;
 mod utils;
+mod api;
+
+use utils::{printer, dates};
+use api::{stackexchange_api};
+use analyzer::{core, primitives};
 
 #[derive(Parser, Deserialize, Debug)]
 struct Cli {
@@ -33,27 +33,27 @@ async fn main() {
     let period = dates::get_period_in_ms(&args.date_start, &args.date_end);
     let options = primitives::Options { tags: args.tags, individual: args.individual};
 
-    let questions = api::get_questions(&period, &args.site).await;
+    let questions = stackexchange_api::get_questions(&period, &args.site).await;
 
-    metrics::print_title(&args.date_start, &args.date_end, &args.site);
+    printer::print_title(&args.date_start, &args.date_end, &args.site);
     
     let global_data = core::collect_global_data(questions.clone(), &options).await;
-    metrics::print_global_data(&global_data);
+    printer::print_global_data(&global_data);
 
     if let Some(team_members) = &args.members {
         let team_data = core::collect_team_data(questions, &args.site, team_members, &options).await;
-        metrics::print_team_data(&team_data.team_answers());
+        printer::print_team_data(&team_data.team_answers());
 
         if options.individual {
-            metrics::print_individual_data(&team_data.individual_answers());
+            printer::print_individual_data(&team_data.individual_answers());
         }
 
-        metrics::print_ratios(&global_data, &team_data.team_answers());
-        metrics::print_response_times(&team_data);
+        printer::print_ratios(&global_data, &team_data.team_answers());
+        printer::print_response_times(&team_data);
     }
 
     if options.tags {
-        metrics::print_tags(&global_data);
+        printer::print_tags(&global_data);
     }
     
 }

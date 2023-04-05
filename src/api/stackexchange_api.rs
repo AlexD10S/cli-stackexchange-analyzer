@@ -1,5 +1,5 @@
 use reqwest::{ header::{CONTENT_TYPE, ACCEPT}};
-use crate::{dtos::{APIResponse, Item}, dates::Period};
+use crate::{api::dtos::{APIResponse, Item}, dates::Period};
 
 
 pub async fn get_questions(period: &Period, site: &String) -> Vec<Item> {
