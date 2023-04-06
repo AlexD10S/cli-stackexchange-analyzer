@@ -2,6 +2,7 @@ use crate::{
     primitives::{TeamAnswers, GlobalData, Tag, MemberAnswer, Answers, CliOptions}, 
     dates::get_epoch_in_hr
 };
+use piechart::{Chart, Color, Data};
 
 const NUMBER_OF_HOT_TAGS: usize = 3;
 const TIMER_EMOJI: char = '\u{23F2}';
@@ -52,15 +53,19 @@ fn print_team_data(team_answered_questions: &TeamAnswers)  {
 fn print_ratios(global_data: &GlobalData, team_data: &TeamAnswers)  {
     println!("------ Team Ratios ------");
     println!();
-    let questions_answered = global_data.total_questions() - global_data.total_unanswered();
-    let float_division_total = *global_data.total_unanswered() as f64 / *global_data.total_questions() as f64;
-    println!("{:?} % of questions on this period unanswered",  float_division_total * 100 as f64 );
+    let float_division_total = (*global_data.total_unanswered() as f32 / *global_data.total_questions() as f32) * 100 as f32;
+    let float_division_total_team= (*team_data.answers() as f32 / *global_data.total_questions() as f32) * 100 as f32;
+    let data = vec![
+        Data { label: "Team Answers".into(), value: float_division_total_team, color: Some(Color::Blue.into()), fill: '•' },
+        Data { label: "Unanswered".into(), value: float_division_total, color: Some(Color::Red.into()), fill: '▪' },
+        Data { label: "Rest".into(), value: (100 as f32 - float_division_total_team - float_division_total), color: Some(Color::Yellow.into()), fill: '▴' },
+    ];
 
-    let float_division_total_team= *team_data.answers() as f64 / *global_data.total_questions() as f64; 
-    println!("{:?} % answered by the team over all questions", float_division_total_team * 100 as f64);
-
-    let float_division_answered_team= *team_data.answers() as f64 / questions_answered as f64; 
-    println!("{:?} % answered by the team over answered questions", float_division_answered_team * 100 as f64);
+    Chart::new()
+        .radius(9)
+        .aspect_ratio(3)
+        .legend(true)
+        .draw(&data);
     println!();
 }
 
