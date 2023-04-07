@@ -1,4 +1,4 @@
-use crate::primitives::{Answers, CliOptions, GlobalData, MemberAnswer};
+use crate::primitives::{MetricAnswers, CliOptions, MetricsQuestions, MemberAnswer};
 use csv;
 use std::error::Error;
 use std::fs::File;
@@ -9,8 +9,8 @@ pub fn export_data(
     date_start: &String,
     date_end: &String,
     options: &CliOptions,
-    global_data: &GlobalData,
-    answers: &Option<Answers>,
+    global_data: &MetricsQuestions,
+    answers: &Option<MetricAnswers>,
 ) {
     //By default export it here
     let path = "./data_exported.csv";
@@ -33,8 +33,8 @@ fn export_data_to_csv(
     date_start: &String,
     date_end: &String,
     options: &CliOptions,
-    global_data: &GlobalData,
-    answers: &Option<Answers>,
+    global_data: &MetricsQuestions,
+    answers: &Option<MetricAnswers>,
     path: &str,
 ) -> Result<(), Box<dyn Error>> {
     // Creates new `Writer` for `stdout`
@@ -93,7 +93,7 @@ fn export_title(
 
 fn export_global_data(
     writer: &mut csv::Writer<File>,
-    global_data: &GlobalData,
+    global_data: &MetricsQuestions,
 ) -> Result<(), Box<dyn Error>> {
     writer.write_record(&[
         "Global Data",
@@ -113,7 +113,7 @@ fn export_global_data(
 
 fn export_team_data(
     writer: &mut csv::Writer<File>,
-    team_data: &Answers,
+    team_data: &MetricAnswers,
 ) -> Result<(), Box<dyn Error>> {
     writer.write_record(&["Team Data", "Questions Answered", "Score", "Accepted"])?;
 
@@ -128,7 +128,7 @@ fn export_team_data(
 
 fn export_individual_team_data(
     writer: &mut csv::Writer<File>,
-    team_data: &Answers,
+    team_data: &MetricAnswers,
 ) -> Result<(), Box<dyn Error>> {
     writer.write_record(&["Individual Data", "", "", ""])?;
     let team_answered_questions: &Vec<MemberAnswer> = &team_data.individual_answers();
@@ -147,8 +147,8 @@ fn export_individual_team_data(
 
 fn export_ratios(
     writer: &mut csv::Writer<File>,
-    global_data: &GlobalData,
-    team_data: &Answers,
+    global_data: &MetricsQuestions,
+    team_data: &MetricAnswers,
 ) -> Result<(), Box<dyn Error>> {
     let questions_answered = global_data.total_questions() - global_data.total_unanswered();
     let float_division_total =
@@ -176,7 +176,7 @@ fn export_ratios(
 
 fn export_time_response(
     writer: &mut csv::Writer<File>,
-    team_data: &Answers,
+    team_data: &MetricAnswers,
 ) -> Result<(), Box<dyn Error>> {
     writer.write_record(&["Response Time", "Average", "Team Average", ""])?;
 
@@ -204,7 +204,7 @@ fn export_time_response(
 
 fn export_tags(
     writer: &mut csv::Writer<File>,
-    global_data: &GlobalData,
+    global_data: &MetricsQuestions,
 ) -> Result<(), Box<dyn Error>> {
     writer.write_record(&["Total Tags", "Tag", "Number", ""])?;
     let mut sorted_list = global_data.tags_total().clone();

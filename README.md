@@ -28,14 +28,14 @@ You can specify a list of user_ids from your site to collect metrics of your tea
 Example:
 
 ```shell
-cargo run -- substrate 02/03/2023 06/03/2023 --members 1 2 3 4
+cargo run -- substrate 02/03/2023 06/03/2023 --members 2762 29 
 ```
 
 ### Team Individual Metrics
 Use the optional flag --individual if want to retrieve the individual information of the team members:
 
 ```shell
-cargo run -- substrate 02/03/2023 06/03/2023  --members 1 2 3 4 --individual
+cargo run -- substrate 02/03/2023 06/03/2023  --members 2762 29 --individual
 ```
 
 ### Tags Metrics

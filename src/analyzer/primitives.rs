@@ -17,20 +17,20 @@ pub struct Tag {
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub struct GlobalData {
+pub struct MetricsQuestions {
     total_questions: usize,
     total_unanswered: usize,
     tags_total: Vec<Tag>,
     tags_unanswered: Vec<Tag>,
 }
-impl GlobalData {
+impl MetricsQuestions {
     pub fn new(
         total_questions: usize,
         total_unanswered: usize,
         tags_total: Vec<Tag>,
         tags_unanswered: Vec<Tag>,
     ) -> Self {
-        GlobalData {
+        MetricsQuestions {
             total_questions,
             total_unanswered,
             tags_total,
@@ -57,14 +57,14 @@ pub struct MemberAnswer {
     pub count: u32,
 }
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub struct TeamAnswers {
+pub struct TeamAnswersMetrics {
     answers: u32,
     score: i32, // Score can be negative
     accepted: u32,
 }
-impl TeamAnswers {
+impl TeamAnswersMetrics {
     pub fn new(answers: u32, score: i32, accepted: u32) -> Self {
-        TeamAnswers {
+        TeamAnswersMetrics {
             answers,
             score,
             accepted,
@@ -79,8 +79,8 @@ impl TeamAnswers {
     pub fn accepted(&self) -> &u32 {
         &self.accepted
     }
-    pub fn question_answered(&self, answer: TeamAnswers) -> TeamAnswers {
-        let new_one = TeamAnswers {
+    pub fn add_question_answered_by_team(&self, answer: TeamAnswersMetrics) -> TeamAnswersMetrics {
+        let new_one = TeamAnswersMetrics {
             answers: self.answers + answer.answers(),
             score: self.score + answer.score(),
             accepted: self.accepted + answer.accepted(),
@@ -90,24 +90,24 @@ impl TeamAnswers {
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub struct Answers {
-    team_answers: TeamAnswers,
+pub struct MetricAnswers {
+    team_answers: TeamAnswersMetrics,
     individual_answers: Vec<MemberAnswer>,
     time_response_questions: Vec<ResponseTime>,
 }
-impl Answers {
+impl MetricAnswers {
     pub fn new(
-        team_answers: TeamAnswers,
+        team_answers: TeamAnswersMetrics,
         individual_answers: Vec<MemberAnswer>,
         time_response_questions: Vec<ResponseTime>,
     ) -> Self {
-        Answers {
+        MetricAnswers {
             team_answers,
             individual_answers,
             time_response_questions,
         }
     }
-    pub fn team_answers(&self) -> &TeamAnswers {
+    pub fn team_answers(&self) -> &TeamAnswersMetrics {
         &self.team_answers
     }
     pub fn individual_answers(&self) -> &Vec<MemberAnswer> {

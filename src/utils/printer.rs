@@ -1,5 +1,5 @@
 use crate::{
-    primitives::{Answers, CliOptions, GlobalData, MemberAnswer, Tag, TeamAnswers},
+    primitives::{MetricAnswers, CliOptions, MetricsQuestions, MemberAnswer, Tag, TeamAnswersMetrics},
     utils::charts::{display_chart_ratios, display_chart_tags},
     utils::dates::get_epoch_in_hr,
 };
@@ -12,21 +12,21 @@ pub fn print_data(
     date_start: &String,
     date_end: &String,
     options: &CliOptions,
-    global_data: &GlobalData,
-    answers: &Option<Answers>,
+    global_data: &MetricsQuestions,
+    answers: &Option<MetricAnswers>,
 ) {
     print_title(&date_start, &date_end, &options.site);
     print_global_data(&global_data);
 
-    if let Some(team_data) = &answers {
-        print_team_data(&team_data.team_answers());
+    if let Some(answers_metrics) = &answers {
+        print_team_data(&answers_metrics.team_answers());
 
         if options.individual {
-            print_individual_data(&team_data.individual_answers());
+            print_individual_data(&answers_metrics.individual_answers());
         }
 
-        print_ratios(&global_data, &team_data.team_answers());
-        print_response_times(&team_data);
+        print_ratios(&global_data, &answers_metrics.team_answers());
+        print_response_times(&answers_metrics);
     }
 
     if options.tags {
@@ -42,7 +42,7 @@ fn print_title(date_start: &String, date_end: &String, site: &String) {
     println!();
 }
 
-fn print_global_data(global_data: &GlobalData) {
+fn print_global_data(global_data: &MetricsQuestions) {
     println!("------ Global Metrics ------");
     println!();
     println!(
@@ -56,7 +56,7 @@ fn print_global_data(global_data: &GlobalData) {
     println!();
 }
 
-fn print_team_data(team_answered_questions: &TeamAnswers) {
+fn print_team_data(team_answered_questions: &TeamAnswersMetrics) {
     println!("------ Team Metrics ------");
     println!();
     println!(
@@ -74,7 +74,7 @@ fn print_team_data(team_answered_questions: &TeamAnswers) {
     println!();
 }
 
-fn print_ratios(global_data: &GlobalData, team_data: &TeamAnswers) {
+fn print_ratios(global_data: &MetricsQuestions, team_data: &TeamAnswersMetrics) {
     println!("------ Team Ratios ------");
     println!();
     let float_division_total = (*global_data.total_unanswered() as f32
@@ -87,7 +87,7 @@ fn print_ratios(global_data: &GlobalData, team_data: &TeamAnswers) {
     println!();
 }
 
-fn print_response_times(answers: &Answers) {
+fn print_response_times(answers: &MetricAnswers) {
     println!(
         "------{:?} {:?} Team Response Times {:?} {:?}------",
         TIMER_EMOJI, TIMER_EMOJI, TIMER_EMOJI, TIMER_EMOJI
@@ -129,7 +129,7 @@ fn print_individual_data(team_answered_questions: &Vec<MemberAnswer>) {
     println!();
 }
 
-fn print_tags(global_data: &GlobalData) {
+fn print_tags(global_data: &MetricsQuestions) {
     println!(
         "------{:?} {:?} Hot Tags {:?} {:?}------",
         HOT_EMOJI, HOT_EMOJI, HOT_EMOJI, HOT_EMOJI
