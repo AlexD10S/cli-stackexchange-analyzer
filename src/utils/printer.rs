@@ -1,9 +1,8 @@
 use crate::{
     primitives::{TeamAnswers, GlobalData, Tag, MemberAnswer, Answers, CliOptions}, 
-    dates::get_epoch_in_hr
+    utils::dates::get_epoch_in_hr,
+    utils::charts::{display_chart_tags, display_chart_ratios},
 };
-use piechart::{Chart, Color, Data};
-
 
 const NUMBER_OF_HOT_TAGS: usize = 4;
 const TIMER_EMOJI: char = '\u{23F2}';
@@ -56,17 +55,8 @@ fn print_ratios(global_data: &GlobalData, team_data: &TeamAnswers)  {
     println!();
     let float_division_total = (*global_data.total_unanswered() as f32 / *global_data.total_questions() as f32) * 100 as f32;
     let float_division_total_team= (*team_data.answers() as f32 / *global_data.total_questions() as f32) * 100 as f32;
-    let data = vec![
-        Data { label: "Team Answers".into(), value: float_division_total_team, color: Some(Color::Blue.into()), fill: '•' },
-        Data { label: "Unanswered".into(), value: float_division_total, color: Some(Color::Red.into()), fill: '▪' },
-        Data { label: "Rest".into(), value: (100 as f32 - float_division_total_team - float_division_total), color: Some(Color::Yellow.into()), fill: '▴' },
-    ];
 
-    Chart::new()
-        .radius(9)
-        .aspect_ratio(3)
-        .legend(true)
-        .draw(&data);
+    display_chart_ratios(float_division_total,float_division_total_team);
     println!();
 }
 
@@ -105,41 +95,20 @@ fn print_individual_data(team_answered_questions: &Vec<MemberAnswer>)  {
 fn print_tags(global_data: &GlobalData,)  {
     println!("------{:?} {:?} Hot Tags {:?} {:?}------", HOT_EMOJI, HOT_EMOJI, HOT_EMOJI, HOT_EMOJI );
     println!();
-    println!("--- Total tags ---");
+    println!("--- Total top tags ---");
     println!();
     print_list(&global_data.tags_total());
     println!();
-    println!("--- Unanswered tags ---");
+    println!("--- Unanswered top tags ---");
     println!();
     print_list(&global_data.tags_unanswered());
     println!();
 }
 
 fn print_list(tags_vec: &Vec<Tag>)  {
-    let colors = vec![Color::Blue.into(), Color::Red.into(), Color::Yellow.into(), Color::Green.into()];
     let mut sorted_list = tags_vec.clone();
     sorted_list.sort_by(|a, b| b.count.cmp(&a.count));
-
-    let mut data = vec![];
     println!();
-    for n in 0..NUMBER_OF_HOT_TAGS { 
-        data.push(Data { 
-            label: sorted_list[n].name.to_string(), 
-            value: sorted_list[n].count as f32, 
-            color:  Some(colors[n%NUMBER_OF_HOT_TAGS]), 
-            fill: '•' });
-        //println!("Tag: {:?}, used in {:?} questions", sorted_list[n].name.to_string(), sorted_list[n].count); 
-    }
-    let rest_of_tags = sorted_list.len() - NUMBER_OF_HOT_TAGS;
-    data.push(Data { 
-        label: "Rest".to_string(), 
-        value: rest_of_tags as f32, 
-        color:  Some(Color::White.into()), 
-        fill: '•' });
-
-    Chart::new()
-        .radius(7)
-        .aspect_ratio(2)
-        .legend(true)
-        .draw(&data);
+    display_chart_tags(&sorted_list, NUMBER_OF_HOT_TAGS);
+    println!();
 }

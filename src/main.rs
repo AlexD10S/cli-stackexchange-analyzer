@@ -44,7 +44,7 @@ async fn main() {
        team_data = Some(core::collect_team_data(questions, team_members, &options).await);
     }
     
-    // Print or export data in a csv file
+    // Print metrics on screen or export the metrics in a csv file
     if args.export {
         exporter::export_data(&args.date_start, &args.date_end, &options, &global_data, &team_data);
     }

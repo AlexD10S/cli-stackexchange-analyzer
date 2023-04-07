@@ -3,3 +3,4 @@
 /.env
 .env
 /data_exported.csv
+.DS_STORE

@@ -1,4 +1,5 @@
 use std::error::Error;
+use std::fs::File;
 use csv;
 use crate::{primitives::{GlobalData,Answers, CliOptions, MemberAnswer}};
 
@@ -32,6 +33,40 @@ fn export_data_to_csv(
     // Creates new `Writer` for `stdout`
     let mut writer = csv::Writer::from_path(path)?;
 
+    export_title(&mut writer, &date_start, &date_end, &options).map_err(|err| eprintln!("{:?}", err)).ok();
+
+    export_global_data(&mut writer, &global_data).map_err(|err| eprintln!("{:?}", err)).ok();
+
+
+    if let Some(team_data) = &answers {
+        export_team_data(&mut writer, &team_data).map_err(|err| eprintln!("{:?}", err)).ok();
+        
+        if options.individual {
+            export_individual_team_data(&mut writer, &team_data).map_err(|err| eprintln!("{:?}", err)).ok();
+        }
+        export_ratios(&mut writer, &global_data, &team_data).map_err(|err| eprintln!("{:?}", err)).ok();
+
+        export_time_response(&mut writer, &team_data).map_err(|err| eprintln!("{:?}", err)).ok();
+    }
+
+    if options.tags {
+        export_tags(&mut writer, &global_data).map_err(|err| eprintln!("{:?}", err)).ok();
+    }
+
+
+    // A CSV writer maintains an internal buffer, so it's important
+    // to flush the buffer when you're done.
+    writer.flush()?;
+
+    Ok(())
+}
+
+
+fn export_title(writer: &mut csv::Writer<File>, 
+    date_start: &String, 
+    date_end: &String, 
+    options: &CliOptions) -> Result<(), Box<dyn Error>> {
+
     writer.write_record(&[
         "Site",
         &options.site,
@@ -44,7 +79,10 @@ fn export_data_to_csv(
         date_end,
         "",
     ])?;
+    Ok(())
+}
 
+fn export_global_data(writer: &mut csv::Writer<File>, global_data: &GlobalData) -> Result<(), Box<dyn Error>> {
     writer.write_record(&[
         "Global Data",
         "Number of Questions",
@@ -58,129 +96,131 @@ fn export_data_to_csv(
         &global_data.total_unanswered().to_string(),
         "",
     ])?;
+    Ok(())
+}
 
-    if let Some(team_data) = &answers {
-        writer.write_record(&[
-            "Team Data",
-            "Questions Answered",
-            "Score",
-            "Accepted",
-        ])?;
-    
-        writer.write_record(&[
-            "",
-            &team_data.team_answers().answers().to_string(),
-            &team_data.team_answers().score().to_string(),
-            &team_data.team_answers().accepted().to_string(),
-        ])?;
+fn export_team_data(writer: &mut csv::Writer<File>, team_data: &Answers) -> Result<(), Box<dyn Error>> {
+    writer.write_record(&[
+        "Team Data",
+        "Questions Answered",
+        "Score",
+        "Accepted",
+    ])?;
 
-        if options.individual {
-            writer.write_record(&[
-                "Individual Data",
-                "",
-                "",
-                "",
-            ])?;
-            let team_answered_questions: &Vec<MemberAnswer> = &team_data.individual_answers();
-            let mut sorted_list = team_answered_questions.clone();
-            sorted_list.sort_by(|a, b| b.count.cmp(&a.count));
-            for member in sorted_list{ 
-                writer.write_record(&[
-                    "Member",
-                    &member.user_id.to_string(),
-                    "Answers",
-                    &member.count.to_string(),
-                ])?;
-            }
+    writer.write_record(&[
+        "",
+        &team_data.team_answers().answers().to_string(),
+        &team_data.team_answers().score().to_string(),
+        &team_data.team_answers().accepted().to_string(),
+    ])?;
+    Ok(())
+}
+
+fn export_individual_team_data(writer: &mut csv::Writer<File>, team_data: &Answers) -> Result<(), Box<dyn Error>> {
+    writer.write_record(&[
+        "Individual Data",
+        "",
+        "",
+        "",
+    ])?;
+    let team_answered_questions: &Vec<MemberAnswer> = &team_data.individual_answers();
+    let mut sorted_list = team_answered_questions.clone();
+    sorted_list.sort_by(|a, b| b.count.cmp(&a.count));
+    for member in sorted_list{ 
+        writer.write_record(&[
+            "Member",
+            &member.user_id.to_string(),
+            "Answers",
+            &member.count.to_string(),
+        ])?;
+    }
+    Ok(())
+}
+
+fn export_ratios(writer: &mut csv::Writer<File>, global_data: &GlobalData, team_data: &Answers) -> Result<(), Box<dyn Error>> {
+    let questions_answered = global_data.total_questions() - global_data.total_unanswered();
+    let float_division_total = *global_data.total_unanswered() as f64 / *global_data.total_questions() as f64;
+    let float_division_total_team= *team_data.team_answers().answers() as f64 / *global_data.total_questions() as f64; 
+    let float_division_answered_team= *team_data.team_answers().answers() as f64 / questions_answered as f64; 
+
+    writer.write_record(&[
+        "Ratios",
+        "Answered by Team",
+        "Unanswered",
+        "Answered by Team over answered",
+    ])?;
+
+    writer.write_record(&[
+        "%",
+        &(float_division_total_team * 100 as f64).to_string(),
+        &(float_division_total * 100 as f64).to_string(),
+        &(float_division_answered_team * 100 as f64).to_string(),
+    ])?;
+    Ok(())
+}
+
+fn export_time_response(writer: &mut csv::Writer<File>, team_data: &Answers) -> Result<(), Box<dyn Error>> {
+    writer.write_record(&[
+        "Response Time",
+        "Average",
+        "Team Average",
+        "",
+    ])?;
+
+    let mut total_time_response: u64 = 0;
+    let mut total_team_time_response: u64 = 0;
+    let time_response_questions = team_data.time_response_questions();
+    for time_response in time_response_questions {
+        if time_response.get_team_answered() {
+            total_team_time_response += time_response.time_response();
         }
-        let questions_answered = global_data.total_questions() - global_data.total_unanswered();
-        let float_division_total = *global_data.total_unanswered() as f64 / *global_data.total_questions() as f64;
-        let float_division_total_team= *team_data.team_answers().answers() as f64 / *global_data.total_questions() as f64; 
-        let float_division_answered_team= *team_data.team_answers().answers() as f64 / questions_answered as f64; 
+        total_time_response += time_response.time_response();
+    }
+    let average_total_response = total_time_response as f64 / time_response_questions.len() as f64;
+    let average_team_response = total_team_time_response as f64 / *team_data.team_answers().answers() as f64;
 
-        writer.write_record(&[
-            "Ratios",
-            "Answered by Team",
-            "Unanswered",
-            "Answered by Team over answered",
-        ])?;
-    
-        writer.write_record(&[
-            "%",
-            &(float_division_total_team * 100 as f64).to_string(),
-            &(float_division_total * 100 as f64).to_string(),
-            &(float_division_answered_team * 100 as f64).to_string(),
-        ])?;
+    writer.write_record(&[
+        "",
+        &(average_total_response).to_string(),
+        &(average_team_response).to_string(),
+       "",
+    ])?;
+    Ok(())
+}
 
-        writer.write_record(&[
-            "Response Time",
-            "Average",
-            "Team Average",
-            "",
-        ])?;
-
-        let mut total_time_response: u64 = 0;
-        let mut total_team_time_response: u64 = 0;
-        let time_response_questions = team_data.time_response_questions();
-        for time_response in time_response_questions {
-            if time_response.get_team_answered() {
-                total_team_time_response += time_response.time_response();
-            }
-            total_time_response += time_response.time_response();
-        }
-        let average_total_response = total_time_response as f64 / time_response_questions.len() as f64;
-        let average_team_response = total_team_time_response as f64 / *team_data.team_answers().answers() as f64;
-    
+fn export_tags(writer: &mut csv::Writer<File>, global_data: &GlobalData) -> Result<(), Box<dyn Error>> {
+    writer.write_record(&[
+        "Total Tags",
+        "Tag",
+        "Number",
+        "",
+    ])?;
+    let mut sorted_list = global_data.tags_total().clone();
+    sorted_list.sort_by(|a, b| b.count.cmp(&a.count));
+    for n in 0..NUMBER_OF_HOT_TAGS { 
         writer.write_record(&[
             "",
-            &(average_total_response).to_string(),
-            &(average_team_response).to_string(),
-           "",
+            &sorted_list[n].name.to_string(),
+            &sorted_list[n].count.to_string(),
+            "",
         ])?;
     }
 
-    if options.tags {
+    writer.write_record(&[
+        "Unanswered Tags",
+        "Tag",
+        "Number",
+        "",
+    ])?;
+    let mut sorted_list_unanswered = global_data.tags_unanswered().clone();
+    sorted_list_unanswered.sort_by(|a, b| b.count.cmp(&a.count));
+    for n in 0..NUMBER_OF_HOT_TAGS { 
         writer.write_record(&[
-            "Total Tags",
-            "Tag",
-            "Number",
+            "",
+            &sorted_list_unanswered[n].name.to_string(),
+            &sorted_list_unanswered[n].count.to_string(),
             "",
         ])?;
-        let mut sorted_list = global_data.tags_total().clone();
-        sorted_list.sort_by(|a, b| b.count.cmp(&a.count));
-        for n in 0..NUMBER_OF_HOT_TAGS { 
-            writer.write_record(&[
-                "",
-                &sorted_list[n].name.to_string(),
-                &sorted_list[n].count.to_string(),
-                "",
-            ])?;
-        }
-
-        writer.write_record(&[
-            "Unanswered Tags",
-            "Tag",
-            "Number",
-            "",
-        ])?;
-        let mut sorted_list_unanswered = global_data.tags_unanswered().clone();
-        sorted_list_unanswered.sort_by(|a, b| b.count.cmp(&a.count));
-        for n in 0..NUMBER_OF_HOT_TAGS { 
-            writer.write_record(&[
-                "",
-                &sorted_list_unanswered[n].name.to_string(),
-                &sorted_list_unanswered[n].count.to_string(),
-                "",
-            ])?;
-        }
-    
-        
     }
-
-
-    // A CSV writer maintains an internal buffer, so it's important
-    // to flush the buffer when you're done.
-    writer.flush()?;
-
     Ok(())
 }
