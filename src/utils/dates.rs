@@ -9,6 +9,10 @@ pub struct Period {
 pub fn get_period_in_ms(date_start: &str, date_end: &str) -> Period {
     let timestamp_start = get_epoch_seconds(&date_start);
     let timestamp_end = get_epoch_seconds(&date_end);
+    
+    if timestamp_end < timestamp_start {
+        panic!("Error with the dates you input, just exit here");  
+    }
     return Period {
         timestamp_start,
         timestamp_end,
@@ -29,7 +33,7 @@ fn get_epoch_seconds(date: &str) -> i64 {
             naive_datetime.timestamp()
         }
         Err(error) => {
-            panic!("Error parsing the date {}, just exit here", error);
+            panic!("Error parsing the dates: {}, just exit here", error);
         }
     }
 }

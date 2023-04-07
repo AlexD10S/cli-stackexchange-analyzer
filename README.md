@@ -6,7 +6,25 @@ Build:
 cargo build -- release
 ```
 
-Run:
+How to use:
+```
+Usage: cli-stackexchange-analyzer [OPTIONS] <SITE> <DATE_START> <DATE_END>
+
+Arguments:
+  <SITE>        Site to fetch the data from
+  <DATE_START>  Date to start - dd/mm/YYYY format
+  <DATE_END>    Date to end - dd/mm/YYYY format
+
+Options:
+  -m, --members <MEMBERS>...  List of members of your team
+  -t, --tags                  Collect tags info
+  -i, --individual            Collect individual team members info
+  -e, --export                Export the data in a csv file
+  -h, --help                  Print help
+  -V, --version               Print version
+```
+
+Collect basic data about questions:
 ```shell
 cargo run -- site date_start date_end
 ```

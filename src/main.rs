@@ -11,18 +11,27 @@ use api::stackexchange_api;
 use utils::{dates, exporter, printer};
 
 #[derive(Parser, Deserialize, Debug)]
+#[command(author, version)]
+#[command(about = "CLI tool to get metrics from a stackexchange site built with Rust 🦀.")]
 struct Cli {
-    site: String,       // Site to query
-    date_start: String, //Date to start with dd/mm/YYYY format
-    date_end: String,   //Date to end with dd/mm/YYYY format
-    #[clap(short, long, value_parser, num_args = 1.., value_delimiter = ' ')]
-    members: Option<Vec<u32>>, //List of members of your team
+    /// Site to fetch the data from
+    site: String,
+    /// Date to start - dd/mm/YYYY format
+    date_start: String,
+    /// Date to end - dd/mm/YYYY format
+    date_end: String, 
+    /// List of members of your team
+    #[clap(short = 'm', long = "members", value_parser, num_args = 1.., value_delimiter = ' ')]
+    members: Option<Vec<u32>>,
+    /// Collect tags info
     #[clap(long, short, action)]
-    tags: bool, //Collect tags info
+    tags: bool, 
+    /// Collect individual team members info
     #[clap(long, short, action)]
-    individual: bool, //Collect individual team members info
+    individual: bool,
+    /// Export the data in a csv file
     #[clap(long, short, action)]
-    export: bool, //Export the data in a csv file
+    export: bool,
 }
 
 #[tokio::main]
@@ -33,6 +42,7 @@ async fn main() {
     let args = Cli::parse();
 
     let period = dates::get_period_in_ms(&args.date_start, &args.date_end);
+
     let options = primitives::CliOptions {
         tags: args.tags,
         individual: args.individual,
