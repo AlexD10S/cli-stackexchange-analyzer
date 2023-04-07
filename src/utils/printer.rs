@@ -4,7 +4,8 @@ use crate::{
 };
 use piechart::{Chart, Color, Data};
 
-const NUMBER_OF_HOT_TAGS: usize = 3;
+
+const NUMBER_OF_HOT_TAGS: usize = 4;
 const TIMER_EMOJI: char = '\u{23F2}';
 const HOT_EMOJI: char = '\u{1F525}';
 
@@ -115,9 +116,30 @@ fn print_tags(global_data: &GlobalData,)  {
 }
 
 fn print_list(tags_vec: &Vec<Tag>)  {
+    let colors = vec![Color::Blue.into(), Color::Red.into(), Color::Yellow.into(), Color::Green.into()];
     let mut sorted_list = tags_vec.clone();
     sorted_list.sort_by(|a, b| b.count.cmp(&a.count));
+
+    let mut data = vec![];
+    println!();
     for n in 0..NUMBER_OF_HOT_TAGS { 
-        println!("Tag: {:?}, used in {:?} questions", sorted_list[n].name.to_string(), sorted_list[n].count); 
+        data.push(Data { 
+            label: sorted_list[n].name.to_string(), 
+            value: sorted_list[n].count as f32, 
+            color:  Some(colors[n%NUMBER_OF_HOT_TAGS]), 
+            fill: '•' });
+        //println!("Tag: {:?}, used in {:?} questions", sorted_list[n].name.to_string(), sorted_list[n].count); 
     }
+    let rest_of_tags = sorted_list.len() - NUMBER_OF_HOT_TAGS;
+    data.push(Data { 
+        label: "Rest".to_string(), 
+        value: rest_of_tags as f32, 
+        color:  Some(Color::White.into()), 
+        fill: '•' });
+
+    Chart::new()
+        .radius(7)
+        .aspect_ratio(2)
+        .legend(true)
+        .draw(&data);
 }
