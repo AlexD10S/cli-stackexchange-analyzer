@@ -1,6 +1,8 @@
-use reqwest::{ header::{CONTENT_TYPE, ACCEPT}};
-use crate::{api::dtos::{APIResponse, Item}, primitives::CliOptions};
-
+use crate::{
+    api::dtos::{APIResponse, Item},
+    primitives::CliOptions,
+};
+use reqwest::header::{ACCEPT, CONTENT_TYPE};
 
 pub async fn get_questions(options: &CliOptions) -> Vec<Item> {
     // .expect("error message") in case the API KEY is mandatory, but if is not there just empty space
@@ -38,7 +40,7 @@ async fn query_questions(options: &CliOptions, api_key: &String, page: i32) -> A
         .send()
         .await
         .unwrap();
-    
+
     match response.status() {
         reqwest::StatusCode::OK => {
             // on success, parse our JSON to an APIResponse

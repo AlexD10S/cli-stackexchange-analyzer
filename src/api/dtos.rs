@@ -6,7 +6,7 @@ pub struct APIResponse {
     pub items: Vec<Item>,
     pub has_more: bool,
     pub quota_max: u64,
-    pub quota_remaining: u64
+    pub quota_remaining: u64,
 }
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Item {
@@ -25,7 +25,7 @@ pub struct Item {
     pub question_id: u128,
     pub content_license: Option<String>,
     pub link: Option<String>,
-    pub title: Option<String>
+    pub title: Option<String>,
 }
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Owner {
@@ -36,5 +36,5 @@ pub struct Owner {
     profile_image: Option<String>,
     display_name: Option<String>,
     link: Option<String>,
-    accept_rate: Option<u64>
+    accept_rate: Option<u64>,
 }

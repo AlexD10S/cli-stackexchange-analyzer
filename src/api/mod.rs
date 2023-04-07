@@ -1,2 +1,2 @@
-pub mod stackexchange_api;
 pub mod dtos;
+pub mod stackexchange_api;

@@ -24,8 +24,18 @@ pub struct GlobalData {
     tags_unanswered: Vec<Tag>,
 }
 impl GlobalData {
-    pub fn new(total_questions: usize, total_unanswered: usize, tags_total: Vec<Tag>, tags_unanswered: Vec<Tag>) -> Self {
-        GlobalData { total_questions, total_unanswered, tags_total, tags_unanswered}
+    pub fn new(
+        total_questions: usize,
+        total_unanswered: usize,
+        tags_total: Vec<Tag>,
+        tags_unanswered: Vec<Tag>,
+    ) -> Self {
+        GlobalData {
+            total_questions,
+            total_unanswered,
+            tags_total,
+            tags_unanswered,
+        }
     }
     pub fn total_questions(&self) -> &usize {
         &self.total_questions
@@ -54,7 +64,11 @@ pub struct TeamAnswers {
 }
 impl TeamAnswers {
     pub fn new(answers: u32, score: i32, accepted: u32) -> Self {
-        TeamAnswers { answers, score, accepted}
+        TeamAnswers {
+            answers,
+            score,
+            accepted,
+        }
     }
     pub fn answers(&self) -> &u32 {
         &self.answers
@@ -66,8 +80,8 @@ impl TeamAnswers {
         &self.accepted
     }
     pub fn question_answered(&self, answer: TeamAnswers) -> TeamAnswers {
-        let new_one =  TeamAnswers { 
-            answers: self.answers + answer.answers(), 
+        let new_one = TeamAnswers {
+            answers: self.answers + answer.answers(),
             score: self.score + answer.score(),
             accepted: self.accepted + answer.accepted(),
         };
@@ -82,10 +96,16 @@ pub struct Answers {
     time_response_questions: Vec<ResponseTime>,
 }
 impl Answers {
-    pub fn new(team_answers: TeamAnswers, 
-        individual_answers: Vec<MemberAnswer>, 
-        time_response_questions: Vec<ResponseTime>) -> Self {
-        Answers { team_answers, individual_answers, time_response_questions}
+    pub fn new(
+        team_answers: TeamAnswers,
+        individual_answers: Vec<MemberAnswer>,
+        time_response_questions: Vec<ResponseTime>,
+    ) -> Self {
+        Answers {
+            team_answers,
+            individual_answers,
+            time_response_questions,
+        }
     }
     pub fn team_answers(&self) -> &TeamAnswers {
         &self.team_answers
@@ -106,7 +126,11 @@ pub struct ResponseTime {
 }
 impl ResponseTime {
     pub fn new(creation_date: u64, response_date: u64, team_answered: bool) -> Self {
-        ResponseTime { creation_date, response_date, team_answered}
+        ResponseTime {
+            creation_date,
+            response_date,
+            team_answered,
+        }
     }
     pub fn set_response_date(&mut self, new_response_date_value: u64) {
         self.response_date = new_response_date_value;

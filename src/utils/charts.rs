@@ -1,14 +1,26 @@
-
-use crate::{
-    primitives::{Tag}, 
-};
+use crate::primitives::Tag;
 use piechart::{Chart, Color, Data};
 
-pub fn display_chart_ratios(float_division_total: f32, float_division_total_team: f32)  {
+pub fn display_chart_ratios(float_division_total: f32, float_division_total_team: f32) {
     let data = vec![
-        Data { label: "Team Answers".into(), value: float_division_total_team, color: Some(Color::Blue.into()), fill: '•' },
-        Data { label: "Unanswered".into(), value: float_division_total, color: Some(Color::Red.into()), fill: '▪' },
-        Data { label: "Rest".into(), value: (100 as f32 - float_division_total_team - float_division_total), color: Some(Color::Yellow.into()), fill: '▴' },
+        Data {
+            label: "Team Answers".into(),
+            value: float_division_total_team,
+            color: Some(Color::Blue.into()),
+            fill: '•',
+        },
+        Data {
+            label: "Unanswered".into(),
+            value: float_division_total,
+            color: Some(Color::Red.into()),
+            fill: '▪',
+        },
+        Data {
+            label: "Rest".into(),
+            value: (100 as f32 - float_division_total_team - float_division_total),
+            color: Some(Color::Yellow.into()),
+            fill: '▴',
+        },
     ];
 
     Chart::new()
@@ -18,23 +30,30 @@ pub fn display_chart_ratios(float_division_total: f32, float_division_total_team
         .draw(&data);
 }
 
-pub fn display_chart_tags(sorted_list: &Vec<Tag>, number_of_tags: usize)  {
-    let colors = vec![Color::Blue.into(), Color::Red.into(), Color::Yellow.into(), Color::Green.into()];
+pub fn display_chart_tags(sorted_list: &Vec<Tag>, number_of_tags: usize) {
+    let colors = vec![
+        Color::Blue.into(),
+        Color::Red.into(),
+        Color::Yellow.into(),
+        Color::Green.into(),
+    ];
     let mut data = vec![];
 
-    for n in 0..number_of_tags { 
-        data.push(Data { 
-            label: sorted_list[n].name.to_string(), 
-            value: sorted_list[n].count as f32, 
-            color:  Some(colors[n % number_of_tags]), 
-            fill: '•' });
+    for n in 0..number_of_tags {
+        data.push(Data {
+            label: sorted_list[n].name.to_string(),
+            value: sorted_list[n].count as f32,
+            color: Some(colors[n % number_of_tags]),
+            fill: '•',
+        });
     }
     let rest_of_tags = sorted_list.len() - number_of_tags;
-    data.push(Data { 
-        label: "Rest".to_string(), 
-        value: rest_of_tags as f32, 
-        color:  Some(Color::White.into()), 
-        fill: '•' });
+    data.push(Data {
+        label: "Rest".to_string(),
+        value: rest_of_tags as f32,
+        color: Some(Color::White.into()),
+        fill: '•',
+    });
 
     Chart::new()
         .radius(7)
