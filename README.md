@@ -38,7 +38,7 @@ cargo run -- substrate 01/02/2023 23/02/2023
 Example with all flags:
 
 ```shell
-cargo run -- substrate 27/02/2023 28/02/2023 --members 2762 29 --tags --individual --unanswered
+cargo run -- substrate 27/02/2023 28/02/2023 --members 2762 29 --tags --individual
 ```
 
 ### Team Metrics

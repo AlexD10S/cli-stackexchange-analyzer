@@ -38,7 +38,7 @@ pub fn parse_answers(
     return team_answer_metrics;
 }
 
-fn add_member_response(answers_by_member_vec: &mut Vec<MemberAnswer>, member_id: &u32) {
+pub fn add_member_response(answers_by_member_vec: &mut Vec<MemberAnswer>, member_id: &u32) {
     let exists = answers_by_member_vec
         .iter()
         .find(|&x| x.user_id == *member_id)
