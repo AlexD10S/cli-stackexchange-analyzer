@@ -19,6 +19,7 @@ Options:
   -m, --members <MEMBERS>...  List of members of your team
   -t, --tags                  Collect tags info
   -i, --individual            Collect individual team members info
+  -b, --by_tag <BY_TAG>       Get the metrics on a specific a tag
   -e, --export                Export the data in a csv file
   -h, --help                  Print help
   -V, --version               Print version
@@ -56,11 +57,18 @@ Use the optional flag --individual if want to retrieve the individual informatio
 cargo run -- substrate 02/03/2023 06/03/2023  --members 2762 29 --individual
 ```
 
-### Tags Metrics
+### Top Tags Metrics
 Also get the hot tags with the optional flag --tags:
 
 ```shell
 cargo run -- substrate 02/03/2023 06/03/2023 --tags
+```
+
+### Specific Tag Metrics
+Get the metrics on a specific a tag with the flag --by_tag TAG:
+
+```shell
+cargo run -- substrate 02/03/2023 06/03/2023 --by_tag ink
 ```
 
 ### Export metrics in a CSV

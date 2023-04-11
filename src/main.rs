@@ -8,7 +8,7 @@ mod utils;
 
 use analyzer::{core, primitives};
 use api::stackexchange_api;
-use utils::{dates, exporter, printer};
+use utils::{dates, exporter, printer, parser};
 
 #[derive(Parser, Deserialize, Debug)]
 #[command(author, version)]
@@ -29,6 +29,9 @@ struct Cli {
     /// Collect individual team members info
     #[clap(long, short, action)]
     individual: bool,
+    /// Get the metrics on a specific a tag
+    #[clap(short = 'b', long = "by_tag", value_parser, num_args = 1)]
+    by_tag: Option<String>,
     /// Export the data in a csv file
     #[clap(long, short, action)]
     export: bool,
@@ -49,13 +52,16 @@ async fn main() {
         site: args.site,
         period,
     };
-    let questions = stackexchange_api::get_questions(&options).await;
+    let mut questions = stackexchange_api::get_questions(&options).await;
+    if let Some(tag) = &args.by_tag {
+        parser::filter_questions_by_tags(&mut questions, tag);
+    }
     let global_data = core::collect_global_data(questions.clone(), &options).await;
 
     let mut team_data: Option<primitives::MetricAnswers> = None;
     if let Some(team_members) = &args.members {
-        let answers = stackexchange_api::get_team_answers(&team_members, &options).await;
         println!("Analyzing all the questions (Please wait)...");
+        let answers = stackexchange_api::get_team_answers(&team_members, &options).await;
         team_data = Some(core::collect_team_data(answers, questions).await);
     }
     

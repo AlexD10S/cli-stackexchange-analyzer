@@ -1,4 +1,14 @@
-use crate::{primitives::Tag};
+use crate::{primitives::Tag, api::dtos::Item};
+
+pub fn filter_questions_by_tags(questions: &mut Vec<Item>, tag: &String) {
+    questions.retain(|question| {
+        let tags = question.tags.as_ref().unwrap();
+        if tags.contains(tag) {
+            return true;
+        }
+        return false;
+    });
+}
 
 pub fn parse_and_add_tags(tags_vec: &mut Vec<Tag>, question_tags: &Vec<String>) {
     for tag in question_tags {
