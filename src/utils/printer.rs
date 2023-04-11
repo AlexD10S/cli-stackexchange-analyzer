@@ -19,14 +19,15 @@ pub fn print_data(
     print_global_data(&global_data);
 
     if let Some(answers_metrics) = &answers {
-        print_team_data(&answers_metrics.team_answers());
+        let team_metrics = &answers_metrics.calculate_team_metrics();
+        print_team_data(&team_metrics);
 
         if options.individual {
             print_individual_data(&answers_metrics.individual_answers());
         }
 
-        print_ratios(&global_data, &answers_metrics.team_answers());
-        print_response_times(&answers_metrics);
+        print_ratios(&global_data, &team_metrics);
+        print_response_times(&answers_metrics, *team_metrics.answers());
     }
 
     if options.tags {
@@ -87,29 +88,13 @@ fn print_ratios(global_data: &MetricsQuestions, team_data: &TeamAnswersMetrics) 
     println!();
 }
 
-fn print_response_times(answers: &MetricAnswers) {
+fn print_response_times(answers: &MetricAnswers, number_answers: u32) {
     println!(
         "------{:?} {:?} Team Response Times {:?} {:?}------",
         TIMER_EMOJI, TIMER_EMOJI, TIMER_EMOJI, TIMER_EMOJI
     );
     println!();
-    let mut total_time_response: u64 = 0;
-    let mut total_team_time_response: u64 = 0;
-    let time_response_questions = answers.time_response_questions();
-    for time_response in time_response_questions {
-        if time_response.get_team_answered() {
-            total_team_time_response += time_response.time_response();
-        }
-        total_time_response += time_response.time_response();
-    }
-    let average_total_response = total_time_response as f64 / time_response_questions.len() as f64;
-    println!(
-        "The average time of response is around {:?} hours",
-        get_epoch_in_hr(average_total_response)
-    );
-
-    let average_team_response =
-        total_team_time_response as f64 / *answers.team_answers().answers() as f64;
+    let average_team_response = answers.time_response_questions(number_answers);
     println!(
         "The average time of team response is around {:?} hours",
         get_epoch_in_hr(average_team_response)
@@ -122,9 +107,9 @@ fn print_individual_data(team_answered_questions: &Vec<MemberAnswer>) {
     println!("------ Individual Metrics ------");
     println!();
     let mut sorted_list = team_answered_questions.clone();
-    sorted_list.sort_by(|a, b| b.count.cmp(&a.count));
+    sorted_list.sort_by(|a, b| b.metrics.answers().cmp(&a.metrics.answers()));
     for member in sorted_list {
-        println!("User {:?} -- Questions: {:?}", member.user_id, member.count);
+        println!("User {:?} -- Questions: {:?}", member.user_id, member.metrics.answers());
     }
     println!();
 }

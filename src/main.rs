@@ -54,9 +54,9 @@ async fn main() {
 
     let mut team_data: Option<primitives::MetricAnswers> = None;
     if let Some(team_members) = &args.members {
-        println!("Analyzing all the questions (Please wait)...");
         let answers = stackexchange_api::get_team_answers(&team_members, &options).await;
-        team_data = Some(core::collect_team_data(answers, questions, team_members, &options).await);
+        println!("Analyzing all the questions (Please wait)...");
+        team_data = Some(core::collect_team_data(answers, questions).await);
     }
     
 

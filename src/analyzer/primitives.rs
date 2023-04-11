@@ -52,9 +52,57 @@ impl MetricsQuestions {
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct MetricAnswers {
+    individual_answers: Vec<MemberAnswer>,
+    time_response_questions: u64,
+}
+impl MetricAnswers {
+    pub fn new(
+        individual_answers: Vec<MemberAnswer>,
+    ) -> Self {
+        MetricAnswers {
+            individual_answers,
+            time_response_questions: 0,
+        }
+    }
+    pub fn individual_answers(&self) -> &Vec<MemberAnswer> {
+        &self.individual_answers
+    }
+    pub fn add_time_response_questions(&mut self, creation_date: u64, response_date: u64) {
+        self.time_response_questions = self.time_response_questions + (response_date - creation_date);
+    }
+    pub fn time_response_questions(&self, number_answers: u32) -> f64 {
+        self.time_response_questions as f64 / number_answers as f64
+    }
+    pub fn add_answer(&mut self, answer: MemberAnswer){
+        if let Some(index) =  self.individual_answers.iter().position(|individual_answer| individual_answer.user_id == answer.user_id) {
+            self.individual_answers[index].metrics = self.individual_answers[index].metrics.add_question_answered(&answer.metrics);
+        }
+        else{
+            self.individual_answers.push(answer);
+        }
+    }
+    pub fn calculate_team_metrics(&self) -> TeamAnswersMetrics{
+        let mut team_metrics = TeamAnswersMetrics::new(0,0,0);
+        for individual_metrics in &self.individual_answers {
+            team_metrics = team_metrics.add_question_answered(&individual_metrics.metrics);
+        }
+        return team_metrics;
+    }
+}
+
+#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct MemberAnswer {
     pub user_id: u32,
-    pub count: u32,
+    pub metrics: TeamAnswersMetrics,
+}
+impl MemberAnswer {
+    pub fn new(user_id: u32, metrics: TeamAnswersMetrics) -> Self {
+        MemberAnswer {
+            user_id,
+            metrics
+        }
+    }
 }
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct TeamAnswersMetrics {
@@ -79,69 +127,13 @@ impl TeamAnswersMetrics {
     pub fn accepted(&self) -> &u32 {
         &self.accepted
     }
-    pub fn add_question_answered_by_team(&self, answer: TeamAnswersMetrics) -> TeamAnswersMetrics {
+    pub fn add_question_answered(&self, answer: &TeamAnswersMetrics) -> TeamAnswersMetrics {
         let new_one = TeamAnswersMetrics {
             answers: self.answers + answer.answers(),
             score: self.score + answer.score(),
             accepted: self.accepted + answer.accepted(),
+
         };
         return new_one;
-    }
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub struct MetricAnswers {
-    team_answers: TeamAnswersMetrics,
-    individual_answers: Vec<MemberAnswer>,
-    time_response_questions: Vec<ResponseTime>,
-}
-impl MetricAnswers {
-    pub fn new(
-        team_answers: TeamAnswersMetrics,
-        individual_answers: Vec<MemberAnswer>,
-        time_response_questions: Vec<ResponseTime>,
-    ) -> Self {
-        MetricAnswers {
-            team_answers,
-            individual_answers,
-            time_response_questions,
-        }
-    }
-    pub fn team_answers(&self) -> &TeamAnswersMetrics {
-        &self.team_answers
-    }
-    pub fn individual_answers(&self) -> &Vec<MemberAnswer> {
-        &self.individual_answers
-    }
-    pub fn time_response_questions(&self) -> &Vec<ResponseTime> {
-        &self.time_response_questions
-    }
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub struct ResponseTime {
-    creation_date: u64,
-    response_date: u64,
-    team_answered: bool,
-}
-impl ResponseTime {
-    pub fn new(creation_date: u64, response_date: u64, team_answered: bool) -> Self {
-        ResponseTime {
-            creation_date,
-            response_date,
-            team_answered,
-        }
-    }
-    pub fn set_response_date(&mut self, new_response_date_value: u64) {
-        self.response_date = new_response_date_value;
-    }
-    pub fn set_team_answered(&mut self, new_team_answered_value: bool) {
-        self.team_answered = new_team_answered_value;
-    }
-    pub fn get_team_answered(&self) -> bool {
-        self.team_answered
-    }
-    pub fn time_response(&self) -> u64 {
-        self.response_date - self.creation_date
     }
 }

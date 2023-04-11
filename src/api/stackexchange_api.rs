@@ -107,33 +107,3 @@ async fn query_answers(members: &String, options: &CliOptions, api_key: &String,
         }
     }
 }
-
-/// Hardly impossible to have more than a 100 answers in a question, so no need for pagination in this method
-pub async fn get_answers(question_id: u128, site: &String) -> APIResponse {
-    // .expect("error message") in case the API KEY is mandatory, but if is not there just empty space
-    let api_key = std::env::var("API_KEY").unwrap_or("".to_string());
-    let url = format!(
-        "https://api.stackexchange.com/2.3/questions/{question_id}/answers?site={site}&pagesize=100&key={api_key}"
-    );
-    let client = reqwest::Client::new();
-    let response = client
-        .get(url)
-        .header(CONTENT_TYPE, "application/json")
-        .header(ACCEPT, "application/json")
-        .send()
-        .await
-        .unwrap();
-
-    match response.status() {
-        reqwest::StatusCode::OK => {
-            // on success, parse our JSON to an APIResponse
-            match response.json::<APIResponse>().await {
-                Ok(parsed) => return parsed,
-                Err(error) => panic!("Error parsing the response: {:?}", error),
-            };
-        }
-        other => {
-            panic!("Uh oh! Something unexpected happened: {:?}", other);
-        }
-    }
-}

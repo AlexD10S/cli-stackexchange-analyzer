@@ -115,13 +115,14 @@ fn export_team_data(
     writer: &mut csv::Writer<File>,
     team_data: &MetricAnswers,
 ) -> Result<(), Box<dyn Error>> {
+    let team_metrics = &team_data.calculate_team_metrics();
     writer.write_record(&["Team Data", "Questions Answered", "Score", "Accepted"])?;
 
     writer.write_record(&[
         "",
-        &team_data.team_answers().answers().to_string(),
-        &team_data.team_answers().score().to_string(),
-        &team_data.team_answers().accepted().to_string(),
+        &team_metrics.answers().to_string(),
+        &team_metrics.score().to_string(),
+        &team_metrics.accepted().to_string(),
     ])?;
     Ok(())
 }
@@ -133,13 +134,13 @@ fn export_individual_team_data(
     writer.write_record(&["Individual Data", "", "", ""])?;
     let team_answered_questions: &Vec<MemberAnswer> = &team_data.individual_answers();
     let mut sorted_list = team_answered_questions.clone();
-    sorted_list.sort_by(|a, b| b.count.cmp(&a.count));
+    sorted_list.sort_by(|a, b| b.metrics.answers().cmp(&a.metrics.answers()));
     for member in sorted_list {
         writer.write_record(&[
             "Member",
             &member.user_id.to_string(),
             "Answers",
-            &member.count.to_string(),
+            &member.metrics.answers().to_string(),
         ])?;
     }
     Ok(())
@@ -153,10 +154,11 @@ fn export_ratios(
     let questions_answered = global_data.total_questions() - global_data.total_unanswered();
     let float_division_total =
         *global_data.total_unanswered() as f64 / *global_data.total_questions() as f64;
-    let float_division_total_team =
-        *team_data.team_answers().answers() as f64 / *global_data.total_questions() as f64;
-    let float_division_answered_team =
-        *team_data.team_answers().answers() as f64 / questions_answered as f64;
+
+    let team_metrics = &team_data.calculate_team_metrics();
+    let answers = team_metrics.answers();
+    let float_division_total_team = *answers as f64 / *global_data.total_questions() as f64;
+    let float_division_answered_team = *answers as f64 / questions_answered as f64;
 
     writer.write_record(&[
         "Ratios",
@@ -178,24 +180,14 @@ fn export_time_response(
     writer: &mut csv::Writer<File>,
     team_data: &MetricAnswers,
 ) -> Result<(), Box<dyn Error>> {
-    writer.write_record(&["Response Time", "Average", "Team Average", ""])?;
+    writer.write_record(&["Response Time", "", "Team Average", ""])?;
 
-    let mut total_time_response: u64 = 0;
-    let mut total_team_time_response: u64 = 0;
-    let time_response_questions = team_data.time_response_questions();
-    for time_response in time_response_questions {
-        if time_response.get_team_answered() {
-            total_team_time_response += time_response.time_response();
-        }
-        total_time_response += time_response.time_response();
-    }
-    let average_total_response = total_time_response as f64 / time_response_questions.len() as f64;
-    let average_team_response =
-        total_team_time_response as f64 / *team_data.team_answers().answers() as f64;
-
+    let team_metrics = &team_data.calculate_team_metrics();
+    let average_team_response = &team_data.time_response_questions(*team_metrics.answers());
+    
     writer.write_record(&[
         "",
-        &(average_total_response).to_string(),
+        "",
         &(average_team_response).to_string(),
         "",
     ])?;

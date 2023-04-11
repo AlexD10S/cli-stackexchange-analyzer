@@ -1,8 +1,7 @@
 use crate::{primitives::{
-    TeamAnswersMetrics, MetricsQuestions, CliOptions, MetricAnswers, ResponseTime},
-    api::dtos::{APIResponse, Item}, 
-    api::stackexchange_api, 
-    utils::parser::{parse_answers, parse_and_add_tags, add_member_response}
+    TeamAnswersMetrics, MetricsQuestions, CliOptions, MetricAnswers, MemberAnswer},
+    api::dtos::{Item}, 
+    utils::parser::{parse_and_add_tags}
 };
 
 pub async fn collect_global_data(questions: Vec<Item>, options: &CliOptions) -> MetricsQuestions  {
@@ -26,48 +25,19 @@ pub async fn collect_global_data(questions: Vec<Item>, options: &CliOptions) -> 
     return global_data;
 }
 
-pub async fn collect_team_data(team_answers: Vec<Item>, questions: Vec<Item>, members: &Vec<u32>, options: &CliOptions) -> MetricAnswers  {
-    let mut answers_by_member = Vec::new();
-    let mut team_answer_metrics =  TeamAnswersMetrics::new(0,0,0);
-    let mut time_response_questions: Vec<ResponseTime> = Vec::new();
+pub async fn collect_team_data(team_answers: Vec<Item>, questions: Vec<Item>) -> MetricAnswers  {
+    let mut metrics: MetricAnswers = MetricAnswers::new(Vec::new());
+
     for answer in &team_answers {
         // This is to get just the answers of questions collected from the specific period selected.
         if let Some(index) =  questions.iter().position(|question| question.question_id == answer.question_id) {
             let question = &questions[index];
-            time_response_questions.push(ResponseTime::new(question.creation_date, answer.creation_date, true));
-            add_member_response(&mut answers_by_member, &answer.owner.user_id.unwrap_or(0));
-            team_answer_metrics = team_answer_metrics.add_question_answered_by_team(TeamAnswersMetrics::new(1, answer.score, answer.is_accepted.unwrap_or(false) as u32));
+            metrics.add_time_response_questions(question.creation_date, answer.creation_date);
+            let answer_metrics = TeamAnswersMetrics::new(1, answer.score, answer.is_accepted.unwrap_or(false) as u32);
+            let answer = MemberAnswer::new(answer.owner.user_id.unwrap_or(0), answer_metrics);
+            metrics.add_answer(answer);
         }
-
        
     }
-    let answers: MetricAnswers = MetricAnswers::new(team_answer_metrics, answers_by_member, time_response_questions);
-    return answers
+    return metrics
 }
-
-// pub async fn collect_team_data(questions: Vec<Item>, members: &Vec<u32>, options: &CliOptions) -> MetricAnswers  {
-//     let mut answers_by_member = Vec::new();
-//     let mut team_answer_metrics =  TeamAnswersMetrics::new(0,0,0);
-//     let mut time_response_questions: Vec<ResponseTime> = Vec::new();
-
-//     for question in &questions {
-//         if question.is_answered.unwrap() || (!question.is_answered.unwrap() && question.answer_count.unwrap() > 0) {
-//             let mut response_time: ResponseTime = ResponseTime::new(question.creation_date, 0, false);
-
-//             let answers_of_question: APIResponse = stackexchange_api::get_answers(question.question_id, &options.site).await;
-            
-//             let team_answer_in_question: TeamAnswersMetrics = parse_answers(
-//                 answers_of_question,
-//                 &mut answers_by_member, 
-//                 members, 
-//                 &mut response_time, 
-//                 options
-//             );
-//             team_answer_metrics = team_answer_metrics.add_question_answered_by_team(team_answer_in_question);
-
-//             time_response_questions.push(response_time);
-//         }
-//     }
-//     let answers: MetricAnswers = MetricAnswers::new(team_answer_metrics, answers_by_member, time_response_questions);
-//     return answers
-// }
