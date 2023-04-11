@@ -1,6 +1,8 @@
 use crate::primitives::Tag;
 use piechart::{Chart, Color, Data};
 
+const NUMBER_OF_HOT_TAGS: usize = 4;
+
 pub fn display_chart_ratios(float_division_total: f32, float_division_total_team: f32) {
     let data = vec![
         Data {
@@ -30,7 +32,7 @@ pub fn display_chart_ratios(float_division_total: f32, float_division_total_team
         .draw(&data);
 }
 
-pub fn display_chart_tags(sorted_list: &Vec<Tag>, number_of_tags: usize) {
+pub fn display_chart_tags(sorted_list: &Vec<Tag>) {
     let colors = vec![
         Color::Blue.into(),
         Color::Red.into(),
@@ -39,6 +41,11 @@ pub fn display_chart_tags(sorted_list: &Vec<Tag>, number_of_tags: usize) {
     ];
     let mut data = vec![];
 
+
+    let mut number_of_tags = NUMBER_OF_HOT_TAGS;
+    if sorted_list.len() < number_of_tags {
+        number_of_tags = sorted_list.len();
+    }
     for n in 0..number_of_tags {
         data.push(Data {
             label: sorted_list[n].name.to_string(),

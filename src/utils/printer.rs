@@ -4,7 +4,6 @@ use crate::{
     utils::dates::get_epoch_in_hr,
 };
 
-const NUMBER_OF_HOT_TAGS: usize = 4;
 const TIMER_EMOJI: char = '\u{23F2}';
 const HOT_EMOJI: char = '\u{1F525}';
 
@@ -120,20 +119,24 @@ fn print_tags(global_data: &MetricsQuestions) {
         HOT_EMOJI, HOT_EMOJI, HOT_EMOJI, HOT_EMOJI
     );
     println!();
-    println!("--- Total top tags ---");
-    println!();
-    print_list(&global_data.tags_total());
-    println!();
-    println!("--- Unanswered top tags ---");
-    println!();
-    print_list(&global_data.tags_unanswered());
-    println!();
+    if global_data.tags_total().len() > 0 {
+        println!("--- Total top tags ---");
+        println!();
+        print_list(&global_data.tags_total());
+        println!();
+    }
+    if global_data.tags_unanswered().len() > 0 {
+        println!("--- Unanswered top tags ---");
+        println!();
+        print_list(&global_data.tags_unanswered());
+        println!();
+    }
 }
 
 fn print_list(tags_vec: &Vec<Tag>) {
     let mut sorted_list = tags_vec.clone();
     sorted_list.sort_by(|a, b| b.count.cmp(&a.count));
     println!();
-    display_chart_tags(&sorted_list, NUMBER_OF_HOT_TAGS);
+    display_chart_tags(&sorted_list);
     println!();
 }
