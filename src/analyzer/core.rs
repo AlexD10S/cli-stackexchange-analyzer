@@ -1,7 +1,7 @@
 use crate::{primitives::{
-    TeamAnswersMetrics, MetricsQuestions, CliOptions, MetricAnswers, MemberAnswer},
+    IndividualMetrics, MetricsQuestions, CliOptions, MetricAnswers, MemberAnswers},
     api::dtos::{Item}, 
-    utils::parser::{parse_and_add_tags}
+    utils::tags_handler::{parse_and_add_tags}
 };
 
 pub async fn collect_global_data(questions: Vec<Item>, options: &CliOptions) -> MetricsQuestions  {
@@ -29,12 +29,14 @@ pub async fn collect_team_data(team_answers: Vec<Item>, questions: Vec<Item>) ->
     let mut metrics: MetricAnswers = MetricAnswers::new(Vec::new());
 
     for answer in &team_answers {
-        // This is to get just the answers of questions collected from the specific period selected.
+        // Get just the answers of the questions collected from the specific period selected (Not all the answers from the team).
         if let Some(index) =  questions.iter().position(|question| question.question_id == answer.question_id) {
-            let question = &questions[index];
-            metrics.add_time_response_questions(question.creation_date, answer.creation_date);
-            let answer_metrics = TeamAnswersMetrics::new(1, answer.score, answer.is_accepted.unwrap_or(false) as u32);
-            let answer = MemberAnswer::new(answer.owner.user_id.unwrap_or(0), answer_metrics);
+            metrics.add_time_response_questions(questions[index].creation_date, answer.creation_date);
+
+            let answer_metrics = 
+                IndividualMetrics::new(1, answer.score, answer.is_accepted.unwrap_or(false) as u32);
+            let answer = MemberAnswers::new(answer.owner.user_id.unwrap_or(0), answer_metrics);
+
             metrics.add_answer(answer);
         }
        

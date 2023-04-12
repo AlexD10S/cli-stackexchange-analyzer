@@ -1,4 +1,4 @@
-use crate::primitives::{MetricAnswers, CliOptions, MetricsQuestions, MemberAnswer};
+use crate::primitives::{MetricAnswers, CliOptions, MetricsQuestions, MemberAnswers};
 use csv;
 use std::error::Error;
 use std::fs::File;
@@ -132,7 +132,7 @@ fn export_individual_team_data(
     team_data: &MetricAnswers,
 ) -> Result<(), Box<dyn Error>> {
     writer.write_record(&["Individual Data", "", "", ""])?;
-    let team_answered_questions: &Vec<MemberAnswer> = &team_data.individual_answers();
+    let team_answered_questions: &Vec<MemberAnswers> = &team_data.individual_answers();
     let mut sorted_list = team_answered_questions.clone();
     sorted_list.sort_by(|a, b| b.metrics.answers().cmp(&a.metrics.answers()));
     for member in sorted_list {

@@ -1,5 +1,5 @@
 use crate::{
-    primitives::{MetricAnswers, CliOptions, MetricsQuestions, MemberAnswer, Tag, TeamAnswersMetrics},
+    primitives::{MetricAnswers, CliOptions, MetricsQuestions, MemberAnswers, Tag, IndividualMetrics},
     utils::charts::{display_chart_ratios, display_chart_tags},
     utils::dates::get_epoch_in_hr,
 };
@@ -56,7 +56,7 @@ fn print_global_data(global_data: &MetricsQuestions) {
     println!();
 }
 
-fn print_team_data(team_answered_questions: &TeamAnswersMetrics) {
+fn print_team_data(team_answered_questions: &IndividualMetrics) {
     println!("------ Team Metrics ------");
     println!();
     println!(
@@ -74,7 +74,7 @@ fn print_team_data(team_answered_questions: &TeamAnswersMetrics) {
     println!();
 }
 
-fn print_ratios(global_data: &MetricsQuestions, team_data: &TeamAnswersMetrics) {
+fn print_ratios(global_data: &MetricsQuestions, team_data: &IndividualMetrics) {
     println!("------ Team Ratios ------");
     println!();
     let float_division_total = (*global_data.total_unanswered() as f32
@@ -102,7 +102,7 @@ fn print_response_times(answers: &MetricAnswers, number_answers: u32) {
     println!();
 }
 
-fn print_individual_data(team_answered_questions: &Vec<MemberAnswer>) {
+fn print_individual_data(team_answered_questions: &Vec<MemberAnswers>) {
     println!("------ Individual Metrics ------");
     println!();
     let mut sorted_list = team_answered_questions.clone();

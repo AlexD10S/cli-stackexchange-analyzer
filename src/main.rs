@@ -8,7 +8,7 @@ mod utils;
 
 use analyzer::{core, primitives};
 use api::stackexchange_api;
-use utils::{dates, exporter, printer, parser};
+use utils::{dates, exporter, printer, tags_handler};
 
 #[derive(Parser, Deserialize, Debug)]
 #[command(author, version)]
@@ -54,18 +54,18 @@ async fn main() {
     };
     let mut questions = stackexchange_api::get_questions(&options).await;
     if let Some(tag) = &args.by_tag {
-        parser::filter_questions_by_tags(&mut questions, tag);
+        tags_handler::filter_questions_by_tags(&mut questions, tag);
     }
     let global_data = core::collect_global_data(questions.clone(), &options).await;
 
     let mut team_data: Option<primitives::MetricAnswers> = None;
     if let Some(team_members) = &args.members {
         println!("Analyzing all the questions (Please wait)...");
+
         let answers = stackexchange_api::get_team_answers(&team_members, &options).await;
         team_data = Some(core::collect_team_data(answers, questions).await);
     }
     
-
     // Print metrics on screen or export the metrics in a csv file
     if args.export {
         exporter::export_data(

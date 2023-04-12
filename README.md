@@ -6,6 +6,11 @@ Build:
 cargo build -- release
 ```
 
+Install the tool locally:
+```shell
+cargo install --path .
+```
+
 How to use:
 ```
 Usage: cli-stackexchange-analyzer [OPTIONS] <SITE> <DATE_START> <DATE_END>
