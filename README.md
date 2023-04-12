@@ -3,7 +3,7 @@ CLI tool to get metrics from a stackexchange site built with Rust 🦀.
 
 Build:
 ```shell
-cargo build -- release
+cargo build
 ```
 
 Install the tool locally:

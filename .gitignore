@@ -4,3 +4,6 @@
 .env
 /data_exported.csv
 .DS_STORE
+/.DS_STORE
+/.Cargo.lock
+.Cargo.lock
