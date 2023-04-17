@@ -1,7 +1,7 @@
 use crate::primitives::Tag;
 use piechart::{Chart, Color, Data};
 
-const NUMBER_OF_HOT_TAGS: usize = 4;
+const NUMBER_OF_HOT_TAGS: usize = 10;
 
 pub fn display_chart_ratios(float_division_total: f32, float_division_total_team: f32) {
     let data = vec![
@@ -50,7 +50,7 @@ pub fn display_chart_tags(sorted_list: &Vec<Tag>) {
         data.push(Data {
             label: sorted_list[n].name.to_string(),
             value: sorted_list[n].count as f32,
-            color: Some(colors[n % number_of_tags]),
+            color: Some(colors[n % colors.len()]),
             fill: '•',
         });
     }
@@ -63,7 +63,7 @@ pub fn display_chart_tags(sorted_list: &Vec<Tag>) {
     });
 
     Chart::new()
-        .radius(7)
+        .radius(12)
         .aspect_ratio(2)
         .legend(true)
         .draw(&data);
