@@ -69,7 +69,7 @@ impl MetricAnswers {
         &self.individual_answers
     }
     pub fn add_time_response_questions(&mut self, creation_date: u64, response_date: u64) {
-        self.time_response_questions = self.time_response_questions + (response_date - creation_date);
+        self.time_response_questions += response_date - creation_date;
     }
     pub fn time_response_questions(&self, number_answers: u32) -> f64 {
         self.time_response_questions as f64 / number_answers as f64
@@ -87,7 +87,7 @@ impl MetricAnswers {
         for individual_metrics in &self.individual_answers {
             team_metrics = team_metrics.add_question_answered(&individual_metrics.metrics);
         }
-        return team_metrics;
+        team_metrics
     }
 }
 
@@ -134,6 +134,6 @@ impl IndividualMetrics {
             accepted: self.accepted + answer.accepted(),
 
         };
-        return new_one;
+        new_one
     }
 }

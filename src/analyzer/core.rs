@@ -21,8 +21,8 @@ pub async fn collect_global_data(questions: Vec<Item>, options: &CliOptions) -> 
             parse_and_add_tags(&mut tags_total, question.tags.as_ref().unwrap());
         }
     }
-    let global_data =  MetricsQuestions::new(total_questions, total_unanswered, tags_total, tags_unanswered);
-    return global_data;
+    
+    MetricsQuestions::new(total_questions, total_unanswered, tags_total, tags_unanswered)
 }
 
 pub async fn collect_team_data(team_answers: Vec<Item>, questions: Vec<Item>) -> MetricAnswers  {
@@ -41,5 +41,5 @@ pub async fn collect_team_data(team_answers: Vec<Item>, questions: Vec<Item>) ->
         }
        
     }
-    return metrics
+    metrics
 }

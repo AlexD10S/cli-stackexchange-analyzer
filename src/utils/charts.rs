@@ -19,7 +19,7 @@ pub fn display_chart_ratios(float_division_total: f32, float_division_total_team
         },
         Data {
             label: "Rest".into(),
-            value: (100 as f32 - float_division_total_team - float_division_total),
+            value: (100_f32 - float_division_total_team - float_division_total),
             color: Some(Color::Yellow.into()),
             fill: '▴',
         },

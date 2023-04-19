@@ -14,23 +14,23 @@ pub fn print_data(
     global_data: &MetricsQuestions,
     answers: &Option<MetricAnswers>,
 ) {
-    print_title(&date_start, &date_end, &options.site);
-    print_global_data(&global_data);
+    print_title(date_start, date_end, &options.site);
+    print_global_data(global_data);
 
     if let Some(answers_metrics) = &answers {
         let team_metrics = &answers_metrics.calculate_team_metrics();
-        print_team_data(&team_metrics);
+        print_team_data(team_metrics);
 
         if options.individual {
-            print_individual_data(&answers_metrics.individual_answers());
+            print_individual_data(answers_metrics.individual_answers());
         }
 
-        print_ratios(&global_data, &team_metrics);
-        print_response_times(&answers_metrics, *team_metrics.answers());
+        print_ratios(global_data, team_metrics);
+        print_response_times(answers_metrics, *team_metrics.answers());
     }
 
     if options.tags {
-        print_tags(&global_data);
+        print_tags(global_data);
     }
 }
 
@@ -79,9 +79,9 @@ fn print_ratios(global_data: &MetricsQuestions, team_data: &IndividualMetrics) {
     println!();
     let float_division_total = (*global_data.total_unanswered() as f32
         / *global_data.total_questions() as f32)
-        * 100 as f32;
+        * 100_f32;
     let float_division_total_team =
-        (*team_data.answers() as f32 / *global_data.total_questions() as f32) * 100 as f32;
+        (*team_data.answers() as f32 / *global_data.total_questions() as f32) * 100_f32;
 
     display_chart_ratios(float_division_total, float_division_total_team);
     println!();
@@ -89,8 +89,7 @@ fn print_ratios(global_data: &MetricsQuestions, team_data: &IndividualMetrics) {
 
 fn print_response_times(answers: &MetricAnswers, number_answers: u32) {
     println!(
-        "------{:?} {:?} Team Response Times {:?} {:?}------",
-        TIMER_EMOJI, TIMER_EMOJI, TIMER_EMOJI, TIMER_EMOJI
+        "------{TIMER_EMOJI:?} {TIMER_EMOJI:?} Team Response Times {TIMER_EMOJI:?} {TIMER_EMOJI:?}------"
     );
     println!();
     let average_team_response = answers.time_response_questions(number_answers);
@@ -106,7 +105,7 @@ fn print_individual_data(team_answered_questions: &Vec<MemberAnswers>) {
     println!("------ Individual Metrics ------");
     println!();
     let mut sorted_list = team_answered_questions.clone();
-    sorted_list.sort_by(|a, b| b.metrics.answers().cmp(&a.metrics.answers()));
+    sorted_list.sort_by(|a, b| b.metrics.answers().cmp(a.metrics.answers()));
     for member in sorted_list {
         println!("User {:?} -- Questions: {:?}", member.user_id, member.metrics.answers());
     }
@@ -115,20 +114,19 @@ fn print_individual_data(team_answered_questions: &Vec<MemberAnswers>) {
 
 fn print_tags(global_data: &MetricsQuestions) {
     println!(
-        "------{:?} {:?} Hot Tags {:?} {:?}------",
-        HOT_EMOJI, HOT_EMOJI, HOT_EMOJI, HOT_EMOJI
+        "------{HOT_EMOJI:?} {HOT_EMOJI:?} Hot Tags {HOT_EMOJI:?} {HOT_EMOJI:?}------"
     );
     println!();
-    if global_data.tags_total().len() > 0 {
+    if !global_data.tags_total().is_empty() {
         println!("--- Total top tags ---");
         println!();
-        print_list(&global_data.tags_total());
+        print_list(global_data.tags_total());
         println!();
     }
-    if global_data.tags_unanswered().len() > 0 {
+    if !global_data.tags_unanswered().is_empty() {
         println!("--- Unanswered top tags ---");
         println!();
-        print_list(&global_data.tags_unanswered());
+        print_list(global_data.tags_unanswered());
         println!();
     }
 }

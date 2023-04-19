@@ -62,7 +62,7 @@ async fn main() {
     if let Some(team_members) = &args.members {
         println!("Analyzing all the questions (Please wait)...");
 
-        let answers = stackexchange_api::get_team_answers(&team_members, &options).await;
+        let answers = stackexchange_api::get_team_answers(team_members, &options).await;
         team_data = Some(core::collect_team_data(answers, questions).await);
     }
     

@@ -6,7 +6,7 @@ pub fn filter_questions_by_tags(questions: &mut Vec<Item>, tag: &String) {
         if tags.contains(tag) {
             return true;
         }
-        return false;
+        false
     });
 }
 
@@ -14,12 +14,11 @@ pub fn parse_and_add_tags(tags_vec: &mut Vec<Tag>, question_tags: &Vec<String>) 
     for tag in question_tags {
         let exists = tags_vec
             .iter()
-            .find(|&x| x.name == tag.to_string())
-            .is_some();
+            .any(|x| x.name == *tag);
         if exists {
             let existing_tag_index = tags_vec
                 .iter()
-                .position(|x| x.name == tag.to_string())
+                .position(|x| x.name == *tag)
                 .unwrap();
             let count = tags_vec[existing_tag_index].count;
             tags_vec[existing_tag_index] = Tag {
